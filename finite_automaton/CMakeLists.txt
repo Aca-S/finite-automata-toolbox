@@ -8,6 +8,7 @@ enable_testing()
 add_executable(
     finite_automaton_test
     finite_automaton_test.cpp
+    finite_automaton.cpp
 )
 
 target_link_libraries(
