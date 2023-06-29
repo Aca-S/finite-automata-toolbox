@@ -1,8 +1,10 @@
 ---
 Language: Cpp
 BasedOnStyle: LLVM
+BreakBeforeBraces: Mozilla
+AlignAfterOpenBracket: AlwaysBreak
+BreakBeforeBinaryOperators: NonAssignment
+ColumnLimit: 120
 IndentWidth: 4
 UseTab: Never
-ColumnLimit: 0
-BreakBeforeBraces: Mozilla
 ...
