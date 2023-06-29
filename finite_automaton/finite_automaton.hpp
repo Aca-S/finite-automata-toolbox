@@ -17,6 +17,8 @@ class FiniteAutomaton
         const std::set<unsigned> &final_states,
         const std::map<std::pair<unsigned, char>, std::set<unsigned>> &transition_function);
 
+    bool accepts(const std::string &word) const;
+
   private:
     FiniteAutomaton(
         const std::set<char> &alphabet, const std::set<unsigned> &states, const std::set<unsigned> &initial_states,
@@ -26,6 +28,8 @@ class FiniteAutomaton
           m_transition_function(transition_function)
     {
     }
+
+    std::set<unsigned> epsilon_closure(const std::set<unsigned> &from_states) const;
 
     std::set<char> m_alphabet;
     std::set<unsigned> m_states;

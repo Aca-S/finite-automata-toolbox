@@ -1,6 +1,7 @@
 #include "finite_automaton.hpp"
 
 #include <algorithm>
+#include <queue>
 #include <ranges>
 
 std::expected<FiniteAutomaton, std::string> FiniteAutomaton::construct(
@@ -49,4 +50,33 @@ std::expected<FiniteAutomaton, std::string> FiniteAutomaton::construct(
                                "subset of the alphabet");
 
     return FiniteAutomaton(alphabet, states, initial_states, final_states, transition_function);
+}
+
+bool FiniteAutomaton::accepts(const std::string &word) const { return true; }
+
+std::set<unsigned> FiniteAutomaton::epsilon_closure(const std::set<unsigned> &from_states) const
+{
+    auto closure = from_states;
+
+    std::queue<unsigned> state_queue;
+    for (const auto &s : from_states)
+        state_queue.push(s);
+
+    while (!state_queue.empty()) {
+        auto current_state = state_queue.front();
+        state_queue.pop();
+
+        auto it = m_transition_function.find({current_state, epsilon_transition_value});
+        if (it == m_transition_function.end())
+            continue;
+
+        for (const auto &s : it->second) {
+            if (!closure.contains(s)) {
+                closure.insert(s);
+                state_queue.push(s);
+            }
+        }
+    }
+
+    return closure;
 }
