@@ -25,7 +25,7 @@ class RegexDriver
 
 // By default, yylex's signature is int yylex(void),
 // so we have to redefine it.
-#define YY_DECL yy::parser::symbol_type yylex(RegexDriver &driver);
+#define YY_DECL yy::parser::symbol_type yylex(RegexDriver &driver)
 // Declare yylex for use in the parser.
 YY_DECL;
 

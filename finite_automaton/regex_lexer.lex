@@ -4,6 +4,7 @@
 
 %{
 #include "regex_driver.hpp"
+#include "regex_parser.tab.hpp"
 %}
 
 %%

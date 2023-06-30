@@ -7,5 +7,5 @@ std::unique_ptr<RegexAST> RegexDriver::parse(const std::string &regex)
     int res = parser();
     string_scan_deinit();
 
-    return res != 0 ? std::move(m_ast) : nullptr;
+    return res == 0 ? std::move(m_ast) : nullptr;
 }
