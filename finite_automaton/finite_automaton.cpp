@@ -52,15 +52,31 @@ std::expected<FiniteAutomaton, std::string> FiniteAutomaton::construct(
     return FiniteAutomaton(alphabet, states, initial_states, final_states, transition_function);
 }
 
-bool FiniteAutomaton::accepts(const std::string &word) const { return true; }
+bool FiniteAutomaton::accepts(const std::string &word) const
+{
+    auto current_states = epsilon_closure(m_initial_states);
+
+    for (const auto &symbol : word) {
+        std::set<unsigned> after_transition_states;
+        const auto ins = std::inserter(after_transition_states, after_transition_states.end());
+        for (const auto &state : current_states) {
+            auto it = m_transition_function.find({state, symbol});
+            if (it != m_transition_function.end())
+                std::ranges::set_union(after_transition_states, it->second, ins);
+        }
+        current_states = epsilon_closure(after_transition_states);
+    }
+
+    return std::ranges::any_of(current_states, [this](const auto &s) { return m_final_states.contains(s); });
+}
 
 std::set<unsigned> FiniteAutomaton::epsilon_closure(const std::set<unsigned> &from_states) const
 {
     auto closure = from_states;
 
     std::queue<unsigned> state_queue;
-    for (const auto &s : from_states)
-        state_queue.push(s);
+    for (const auto &state : from_states)
+        state_queue.push(state);
 
     while (!state_queue.empty()) {
         auto current_state = state_queue.front();
@@ -70,10 +86,10 @@ std::set<unsigned> FiniteAutomaton::epsilon_closure(const std::set<unsigned> &fr
         if (it == m_transition_function.end())
             continue;
 
-        for (const auto &s : it->second) {
-            if (!closure.contains(s)) {
-                closure.insert(s);
-                state_queue.push(s);
+        for (const auto &state : it->second) {
+            if (!closure.contains(state)) {
+                closure.insert(state);
+                state_queue.push(state);
             }
         }
     }
