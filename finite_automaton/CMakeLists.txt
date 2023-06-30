@@ -1,6 +1,24 @@
+find_package(BISON REQUIRED)
+find_package(FLEX REQUIRED)
+
+bison_target(
+    regex_parser
+    regex_parser.ypp
+    ${CMAKE_CURRENT_BINARY_DIR}/regex_parser.tab.cpp
+)
+
+flex_target(
+    regex_lexer
+    regex_lexer.lex
+    ${CMAKE_CURRENT_BINARY_DIR}/lex.yy.cpp
+)
+
 add_library(
     finite_automaton
     finite_automaton.cpp
+    regex_ast.cpp
+    #${BISON_regex_parser_OUTPUTS}
+    #${FLEX_regex_parser_OUTPUTS}
 )
 
 enable_testing()
