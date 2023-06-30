@@ -73,6 +73,15 @@ bool FiniteAutomaton::accepts(const std::string &word) const
     return std::ranges::any_of(current_states, [this](const auto &s) { return m_final_states.contains(s); });
 }
 
+FiniteAutomaton::FiniteAutomaton(
+    const std::set<char> &alphabet, const std::set<unsigned> &states, const std::set<unsigned> &initial_states,
+    const std::set<unsigned> &final_states,
+    const std::map<std::pair<unsigned, char>, std::set<unsigned>> &transition_function)
+    : m_alphabet(alphabet), m_states(states), m_initial_states(initial_states), m_final_states(final_states),
+      m_transition_function(transition_function)
+{
+}
+
 std::set<unsigned> FiniteAutomaton::epsilon_closure(const std::set<unsigned> &from_states) const
 {
     auto closure = from_states;
