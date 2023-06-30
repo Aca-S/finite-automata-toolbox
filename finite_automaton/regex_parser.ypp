@@ -1,0 +1,28 @@
+%language "c++"
+%require "3.2"
+%define api.token.constructor
+%define api.value.type variant
+
+%code requires {
+    class RegexDriver;
+}
+
+%param { RegexDriver &driver }
+
+%code {
+    #include "regex_driver.hpp"
+}
+
+%token <char> SYM_T
+
+%start regex
+
+%%
+
+regex: SYM_T { };
+
+%%
+
+void yy::parser::error(const std::string &message)
+{
+}
