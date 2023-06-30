@@ -64,7 +64,10 @@ bool FiniteAutomaton::accepts(const std::string &word) const
             if (it != m_transition_function.end())
                 std::ranges::set_union(after_transition_states, it->second, ins);
         }
-        current_states = epsilon_closure(after_transition_states);
+        if (!after_transition_states.empty())
+            current_states = epsilon_closure(after_transition_states);
+        else
+            return false;
     }
 
     return std::ranges::any_of(current_states, [this](const auto &s) { return m_final_states.contains(s); });
