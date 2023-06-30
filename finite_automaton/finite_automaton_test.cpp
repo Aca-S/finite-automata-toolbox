@@ -47,19 +47,12 @@ class FiniteAutomatonTest : public ::testing::Test
     {
         auto eps = FiniteAutomaton::epsilon_transition_value;
 
-        auto ends_with_ab_e = FiniteAutomaton::construct(
-            {'a', 'b'}, {0, 1, 2}, {0}, {2}, {{{0, 'a'}, {0, 1}}, {{0, 'b'}, {0}}, {{1, 'b'}, {2}}});
-        ASSERT_TRUE(ends_with_ab_e);
-        ends_with_ab = new FiniteAutomaton(*ends_with_ab_e);
-
-        auto even_num_of_a_e = FiniteAutomaton::construct(
-            {'a', 'b'}, {0, 1}, {0}, {0}, {{{0, 'a'}, {1}}, {{0, 'b'}, {0}}, {{1, 'a'}, {0}}, {{1, 'b'}, {1}}});
-        ASSERT_TRUE(even_num_of_a_e);
-        even_num_of_a = new FiniteAutomaton(*even_num_of_a_e);
-
-        auto empty_word_e = FiniteAutomaton::construct({}, {0}, {0}, {0}, {{{0, eps}, {0}}});
-        ASSERT_TRUE(empty_word_e);
-        empty_word = new FiniteAutomaton(*empty_word_e);
+        // With the assumption that the automatons are properly constructed.
+        ends_with_ab = new FiniteAutomaton(*FiniteAutomaton::construct(
+            {'a', 'b'}, {0, 1, 2}, {0}, {2}, {{{0, 'a'}, {0, 1}}, {{0, 'b'}, {0}}, {{1, 'b'}, {2}}}));
+        even_num_of_a = new FiniteAutomaton(*FiniteAutomaton::construct(
+            {'a', 'b'}, {0, 1}, {0}, {0}, {{{0, 'a'}, {1}}, {{0, 'b'}, {0}}, {{1, 'a'}, {0}}, {{1, 'b'}, {1}}}));
+        empty_word = new FiniteAutomaton(*FiniteAutomaton::construct({}, {0}, {0}, {0}, {{{0, eps}, {0}}}));
     }
 
     void TearDown() override
@@ -78,19 +71,19 @@ TEST_F(FiniteAutomatonTest, Accept)
 {
     for (const auto &word : {"ab", "abab", "bbbabbbaaabbabaab"})
         ASSERT_TRUE(ends_with_ab->accepts(word));
-        
+
     for (const auto &word : {"", "babababaqabab", "ba"})
         ASSERT_FALSE(ends_with_ab->accepts(word));
-        
+
     for (const auto &word : {"", "aaaa", "baaabaaab"})
         ASSERT_TRUE(even_num_of_a->accepts(word));
-        
+
     for (const auto &word : {"", "aaaa", "baaabaaab"})
         ASSERT_TRUE(even_num_of_a->accepts(word));
-        
+
     for (const auto &word : {"a", "aaabbb", "bababa"})
         ASSERT_FALSE(even_num_of_a->accepts(word));
-        
+
     ASSERT_TRUE(empty_word->accepts(""));
     ASSERT_FALSE(empty_word->accepts("10101"));
 }
