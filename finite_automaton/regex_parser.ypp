@@ -5,6 +5,8 @@
 
 %code requires {
     class RegexDriver;
+    class RegexAST;
+    #include <memory>
 }
 
 %param { RegexDriver &driver }
@@ -14,15 +16,38 @@
 }
 
 %token <char> SYM_T
+%nterm <std::unique_ptr<RegexAST>> opt_alt opt_concat opt_unary base
 
 %start regex
 
 %%
 
-regex: SYM_T { };
+regex:
+    opt_alt { driver.m_ast = std::move($1); }
+;
+
+opt_alt:
+    opt_alt '|' opt_concat { $$ = std::make_unique<RegexAST>(ConcatenationAST(std::move($1), std::move($3))); }
+|   opt_concat { $$ = std::move($1); }
+;
+
+opt_concat:
+    opt_concat opt_unary { $$ = std::make_unique<RegexAST>(ConcatenationAST(std::move($1), std::move($2))); }
+|   opt_unary { $$ = std::move($1); }
+;
+
+opt_unary:
+    base '?' { $$ = std::make_unique<RegexAST>(ZeroOrOneAST(std::move($1))); }
+|   base '*' { $$ = std::make_unique<RegexAST>(ZeroOrMoreAST(std::move($1))); }
+|   base '+' { $$ = std::make_unique<RegexAST>(OneOrMoreAST(std::move($1))); }
+|   base { $$ = std::move($1); }
+;
+
+base:
+    '(' opt_alt ')' { $$ = std::move($2); }
+|   SYM_T { $$ = std::make_unique<RegexAST>(SymbolAST($1)); }
+;
 
 %%
 
-void yy::parser::error(const std::string &message)
-{
-}
+void yy::parser::error(const std::string &message) { }

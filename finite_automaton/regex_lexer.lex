@@ -8,7 +8,13 @@
 
 %%
 
-. { }
+[|?*+()] {
+    return *yytext;
+}
+
+. {
+    return yy::parser::make_SYM_T(*yytext);
+}
 
 %%
 

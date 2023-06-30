@@ -4,8 +4,13 @@
 #include "regex_ast.hpp"
 #include "regex_parser.tab.hpp"
 
+#include <memory>
+
 class RegexDriver
 {
+    // Needed for accessing m_ast from the parser.
+    friend class yy::parser;
+
   public:
     std::unique_ptr<RegexAST> parse(const std::string &regex);
 
@@ -14,6 +19,8 @@ class RegexDriver
     // do extern declarations for the needed lexer functions.
     void string_scan_init(const std::string &regex);
     void string_scan_deinit();
+
+    std::unique_ptr<RegexAST> m_ast;
 };
 
 // By default, yylex's signature is int yylex(void),
