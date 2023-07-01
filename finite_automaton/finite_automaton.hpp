@@ -21,6 +21,8 @@ class FiniteAutomaton
 
     bool accepts(const std::string &word) const;
 
+    FiniteAutomaton determinize() const;
+
   private:
     FiniteAutomaton(
         const std::set<char> &alphabet, const std::set<unsigned> &states, const std::set<unsigned> &initial_states,

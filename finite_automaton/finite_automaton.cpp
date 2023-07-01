@@ -158,6 +158,56 @@ bool FiniteAutomaton::accepts(const std::string &word) const
     return std::ranges::any_of(current_states, [this](const auto &s) { return m_final_states.contains(s); });
 }
 
+FiniteAutomaton FiniteAutomaton::determinize() const
+{
+    std::set<unsigned> determinized_states;
+    std::set<unsigned> determinized_final_states;
+    std::map<std::pair<unsigned, char>, std::set<unsigned>> determinized_transition_function;
+
+    std::map<std::set<unsigned>, unsigned> constructed_subsets;
+
+    unsigned state_counter = 0;
+    const auto initial_subset = epsilon_closure(m_initial_states);
+    constructed_subsets[initial_subset] = state_counter;
+
+    // As an optimization, could use a bijective map structure
+    // and instead of sets, store their state tags in the queue.
+    std::queue<std::set<unsigned>> subset_queue;
+    subset_queue.push(initial_subset);
+
+    while (!subset_queue.empty()) {
+        const auto current_subset = subset_queue.front();
+        subset_queue.pop();
+
+        const auto current_state = constructed_subsets[current_subset];
+        determinized_states.insert(current_state);
+        if (std::ranges::any_of(current_subset, [this](const auto &state) { return m_final_states.contains(state); }))
+            determinized_final_states.insert(current_state);
+
+        for (const auto &symbol : m_alphabet) {
+            std::set<unsigned> new_subset;
+            for (const auto &state : current_subset) {
+                auto it = m_transition_function.find({state, symbol});
+                if (it != m_transition_function.end())
+                    new_subset.merge(epsilon_closure(it->second));
+            }
+
+            if (new_subset.empty())
+                continue;
+
+            auto it = constructed_subsets.find(new_subset);
+            if (it == constructed_subsets.end()) {
+                constructed_subsets[new_subset] = ++state_counter;
+                subset_queue.push(new_subset);
+            }
+            determinized_transition_function[{current_state, symbol}].insert(constructed_subsets[new_subset]);
+        }
+    }
+
+    return FiniteAutomaton(
+        m_alphabet, determinized_states, {0}, determinized_final_states, determinized_transition_function);
+}
+
 FiniteAutomaton::FiniteAutomaton(
     const std::set<char> &alphabet, const std::set<unsigned> &states, const std::set<unsigned> &initial_states,
     const std::set<unsigned> &final_states,
