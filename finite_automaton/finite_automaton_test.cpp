@@ -40,6 +40,104 @@ TEST(FiniteAutomatonConstruct, ByMember)
         << "The symbols in the transition function, excluding eps, must form a subset of the alphabet";
 }
 
+TEST(FiniteAutomatonConstruct, RegexSymbol)
+{
+    auto fa = FiniteAutomaton::construct("a");
+    ASSERT_TRUE(fa);
+
+    EXPECT_TRUE(fa.value().accepts("a"));
+
+    EXPECT_FALSE(fa.value().accepts("aa"));
+    EXPECT_FALSE(fa.value().accepts("b"));
+    EXPECT_FALSE(fa.value().accepts(""));
+}
+
+TEST(FiniteAutomatonConstruct, RegexOneOrMore)
+{
+    auto fa = FiniteAutomaton::construct("a+");
+    ASSERT_TRUE(fa);
+
+    EXPECT_TRUE(fa.value().accepts("a"));
+    EXPECT_TRUE(fa.value().accepts("aa"));
+    EXPECT_TRUE(fa.value().accepts("aaa"));
+
+    EXPECT_FALSE(fa.value().accepts(""));
+}
+
+TEST(FiniteAutomatonConstruct, RegexZeroOrMore)
+{
+    auto fa = FiniteAutomaton::construct("a*");
+    ASSERT_TRUE(fa);
+
+    EXPECT_TRUE(fa.value().accepts(""));
+    EXPECT_TRUE(fa.value().accepts("a"));
+    EXPECT_TRUE(fa.value().accepts("aa"));
+
+    EXPECT_FALSE(fa.value().accepts("abababab"));
+}
+
+TEST(FiniteAutomatonConstruct, RegexZeroOrOne)
+{
+    auto fa = FiniteAutomaton::construct("a?");
+    ASSERT_TRUE(fa);
+
+    EXPECT_TRUE(fa.value().accepts(""));
+    EXPECT_TRUE(fa.value().accepts("a"));
+
+    EXPECT_FALSE(fa.value().accepts("aa"));
+}
+
+TEST(FiniteAutomatonConstruct, RegexAlternation)
+{
+    auto fa = FiniteAutomaton::construct("a|b");
+    ASSERT_TRUE(fa);
+
+    EXPECT_TRUE(fa.value().accepts("a"));
+    EXPECT_TRUE(fa.value().accepts("b"));
+
+    EXPECT_FALSE(fa.value().accepts(""));
+    EXPECT_FALSE(fa.value().accepts("c"));
+    EXPECT_FALSE(fa.value().accepts("ab"));
+    EXPECT_FALSE(fa.value().accepts("aa"));
+    EXPECT_FALSE(fa.value().accepts("bb"));
+}
+
+TEST(FiniteAutomatonConstruct, RegexConcatenation)
+{
+    auto fa = FiniteAutomaton::construct("ab");
+    ASSERT_TRUE(fa);
+
+    EXPECT_TRUE(fa.value().accepts("ab"));
+
+    EXPECT_FALSE(fa.value().accepts(""));
+    EXPECT_FALSE(fa.value().accepts("ba"));
+    EXPECT_FALSE(fa.value().accepts("aa"));
+    EXPECT_FALSE(fa.value().accepts("bb"));
+}
+
+TEST(FiniteAutomatonConstruct, RegexComplex)
+{
+    auto fa = FiniteAutomaton::construct("(ab|b*a+)*");
+    ASSERT_TRUE(fa);
+
+    EXPECT_TRUE(fa.value().accepts(""));
+    EXPECT_TRUE(fa.value().accepts("ab"));
+    EXPECT_TRUE(fa.value().accepts("ababaaaaa"));
+    EXPECT_TRUE(fa.value().accepts("aaaaaaa"));
+    EXPECT_TRUE(fa.value().accepts("baaaabbbbbaaa"));
+
+    EXPECT_FALSE(fa.value().accepts("abb"));
+    EXPECT_FALSE(fa.value().accepts("bbbbbbbbbb"));
+}
+
+TEST(FiniteAutomatonConstruct, RegexInvalid)
+{
+    EXPECT_FALSE(FiniteAutomaton::construct("")) << "Empty string is not a valid regex";
+    EXPECT_FALSE(FiniteAutomaton::construct("()"));
+    EXPECT_FALSE(FiniteAutomaton::construct("a+?*")) << "Chaining unary operators without parentheses is invalid";
+    EXPECT_FALSE(FiniteAutomaton::construct("a|"));
+}
+
 class FiniteAutomatonTest : public ::testing::Test
 {
   protected:
