@@ -10,6 +10,8 @@ class ConcatenationAST
 {
   public:
     ConcatenationAST(std::unique_ptr<RegexAST> left, std::unique_ptr<RegexAST> right);
+    const RegexAST &get_left() const;
+    const RegexAST &get_right() const;
 
   private:
     std::unique_ptr<RegexAST> m_left, m_right;
@@ -19,6 +21,8 @@ class AlternationAST
 {
   public:
     AlternationAST(std::unique_ptr<RegexAST> left, std::unique_ptr<RegexAST> right);
+    const RegexAST &get_left() const;
+    const RegexAST &get_right() const;
 
   private:
     std::unique_ptr<RegexAST> m_left, m_right;
@@ -28,6 +32,7 @@ class ZeroOrOneAST
 {
   public:
     ZeroOrOneAST(std::unique_ptr<RegexAST> operand);
+    const RegexAST &get_operand() const;
 
   private:
     std::unique_ptr<RegexAST> m_operand;
@@ -37,6 +42,7 @@ class ZeroOrMoreAST
 {
   public:
     ZeroOrMoreAST(std::unique_ptr<RegexAST> operand);
+    const RegexAST &get_operand() const;
 
   private:
     std::unique_ptr<RegexAST> m_operand;
@@ -46,6 +52,7 @@ class OneOrMoreAST
 {
   public:
     OneOrMoreAST(std::unique_ptr<RegexAST> operand);
+    const RegexAST &get_operand() const;
 
   private:
     std::unique_ptr<RegexAST> m_operand;
@@ -55,6 +62,7 @@ class SymbolAST
 {
   public:
     SymbolAST(char symbol);
+    char get_symbol() const;
 
   private:
     char m_symbol;
