@@ -1,30 +1,18 @@
-find_package(BISON REQUIRED)
-find_package(FLEX REQUIRED)
-
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}
-)
-
-bison_target(
-    regex_parser
-    regex_parser.ypp
-    ${CMAKE_CURRENT_BINARY_DIR}/regex_parser.tab.cpp
-)
-
-flex_target(
-    regex_lexer
-    regex_lexer.lex
-    ${CMAKE_CURRENT_BINARY_DIR}/lex.yy.cpp
-)
+add_subdirectory(regex_driver)
 
 add_library(
     finite_automaton
     finite_automaton.cpp
-    regex_ast.cpp
-    regex_driver.cpp
-    ${BISON_regex_parser_OUTPUTS}
-    ${FLEX_regex_parser_OUTPUTS}
+)
+
+target_link_libraries(
+    finite_automaton 
+    PUBLIC regex_driver
+)
+
+target_include_directories(
+    finite_automaton PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/regex_driver"
 )
 
 enable_testing()
@@ -32,11 +20,11 @@ enable_testing()
 add_executable(
     finite_automaton_test
     finite_automaton_test.cpp
-    finite_automaton.cpp
 )
 
 target_link_libraries(
     finite_automaton_test
+    PUBLIC finite_automaton
     GTest::gtest_main
 )
 

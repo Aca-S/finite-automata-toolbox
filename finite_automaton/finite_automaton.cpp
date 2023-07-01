@@ -1,4 +1,5 @@
 #include "finite_automaton.hpp"
+#include "regex_driver.hpp"
 
 #include <algorithm>
 #include <queue>
@@ -50,6 +51,13 @@ std::expected<FiniteAutomaton, std::string> FiniteAutomaton::construct(
                                "subset of the alphabet");
 
     return FiniteAutomaton(alphabet, states, initial_states, final_states, transition_function);
+}
+
+std::expected<FiniteAutomaton, std::string> FiniteAutomaton::construct(const std::string &regex)
+{
+    RegexDriver driver;
+    driver.parse(regex);
+    return std::unexpected("abc");
 }
 
 bool FiniteAutomaton::accepts(const std::string &word) const

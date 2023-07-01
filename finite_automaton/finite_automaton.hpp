@@ -16,6 +16,8 @@ class FiniteAutomaton
         const std::set<char> &alphabet, const std::set<unsigned> &states, const std::set<unsigned> &initial_states,
         const std::set<unsigned> &final_states,
         const std::map<std::pair<unsigned, char>, std::set<unsigned>> &transition_function);
+        
+    static std::expected<FiniteAutomaton, std::string> construct(const std::string &regex);
 
     bool accepts(const std::string &word) const;
 
