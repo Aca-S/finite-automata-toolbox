@@ -27,7 +27,7 @@ regex:
 ;
 
 opt_alt:
-    opt_alt '|' opt_concat { $$ = std::make_unique<RegexAST>(ConcatenationAST(std::move($1), std::move($3))); }
+    opt_alt '|' opt_concat { $$ = std::make_unique<RegexAST>(AlternationAST(std::move($1), std::move($3))); }
 |   opt_concat { $$ = std::move($1); }
 ;
 
