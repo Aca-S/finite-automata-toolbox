@@ -53,11 +53,88 @@ std::expected<FiniteAutomaton, std::string> FiniteAutomaton::construct(
     return FiniteAutomaton(alphabet, states, initial_states, final_states, transition_function);
 }
 
+namespace {
+
+template <class... Ts> struct overloaded : Ts...
+{
+    using Ts::operator()...;
+};
+
+template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
+using tf_t = std::map<std::pair<unsigned, char>, std::set<unsigned>>;
+
+std::pair<tf_t, unsigned> compile_regex(const RegexAST &ast, unsigned start_state)
+{
+    const auto &eps = FiniteAutomaton::epsilon_transition_value;
+    return std::visit(
+        overloaded{
+            [start_state](const ConcatenationAST &node) {
+                auto [transition_function_left, end_state_left] = compile_regex(node.get_left(), start_state);
+                auto [transition_function_right, end_state_right] = compile_regex(node.get_right(), end_state_left);
+                transition_function_right.merge(transition_function_left);
+                return std::make_pair(transition_function_right, end_state_right);
+            },
+            [start_state](const AlternationAST &node) {
+                auto [transition_function_left, end_state_left] = compile_regex(node.get_left(), start_state + 1);
+                auto [transition_function_right, end_state_right] = compile_regex(node.get_right(), end_state_left + 1);
+                transition_function_right.merge(transition_function_left);
+                transition_function_right[{start_state, eps}].insert(start_state + 1);
+                transition_function_right[{start_state, eps}].insert(end_state_left + 1);
+                transition_function_right[{end_state_left, eps}].insert(end_state_right + 1);
+                transition_function_right[{end_state_right, eps}].insert(end_state_right + 1);
+                return std::make_pair(transition_function_right, end_state_right + 1);
+            },
+            [start_state](const ZeroOrOneAST &node) {
+                auto [transition_function, end_state] = compile_regex(node.get_operand(), start_state + 1);
+                transition_function[{start_state, eps}].insert(start_state + 1);
+                transition_function[{start_state, eps}].insert(end_state + 1);
+                transition_function[{end_state, eps}].insert(end_state + 1);
+                return std::make_pair(transition_function, end_state + 1);
+            },
+            [start_state](const ZeroOrMoreAST &node) {
+                auto [transition_function, end_state] = compile_regex(node.get_operand(), start_state + 1);
+                transition_function[{start_state, eps}].insert(start_state + 1);
+                transition_function[{start_state, eps}].insert(end_state + 1);
+                transition_function[{end_state, eps}].insert(start_state + 1);
+                transition_function[{end_state, eps}].insert(end_state + 1);
+                return std::make_pair(transition_function, end_state + 1);
+            },
+            [start_state](const OneOrMoreAST &node) {
+                auto [transition_function, end_state] = compile_regex(node.get_operand(), start_state + 1);
+                transition_function[{start_state, eps}].insert(start_state + 1);
+                transition_function[{end_state, eps}].insert(start_state + 1);
+                transition_function[{end_state, eps}].insert(end_state + 1);
+                return std::make_pair(transition_function, end_state + 1);
+            },
+            [start_state](const SymbolAST &node) {
+                tf_t transition_function;
+                transition_function[{start_state, node.get_symbol()}].insert(start_state + 1);
+                return std::make_pair(transition_function, start_state + 1);
+            }},
+        ast);
+}
+} // namespace
+
 std::expected<FiniteAutomaton, std::string> FiniteAutomaton::construct(const std::string &regex)
 {
     RegexDriver driver;
-    driver.parse(regex);
-    return std::unexpected("abc");
+    auto ast = driver.parse(regex);
+
+    if (!ast)
+        return std::unexpected("Regex parsing error");
+
+    auto [transition_function, end_state] = compile_regex(*ast, 0);
+
+    auto alphabet_range = std::views::keys(transition_function) | std::views::elements<1>
+                          | std::views::filter([](unsigned symbol) { return symbol != epsilon_transition_value; });
+    std::set<char> alphabet(alphabet_range.begin(), alphabet_range.end());
+
+    std::set<unsigned> states;
+    for (unsigned s = 0; s <= end_state; ++s)
+        states.insert(s);
+
+    return FiniteAutomaton(alphabet, states, {0}, {end_state}, transition_function);
 }
 
 bool FiniteAutomaton::accepts(const std::string &word) const
