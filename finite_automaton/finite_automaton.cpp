@@ -238,6 +238,19 @@ FiniteAutomaton FiniteAutomaton::complete() const
     return FiniteAutomaton(m_alphabet, complete_states, m_initial_states, m_final_states, complete_transition_function);
 }
 
+const std::set<char> &FiniteAutomaton::get_alphabet() const { return m_alphabet; }
+
+const std::set<unsigned> &FiniteAutomaton::get_states() const { return m_states; }
+
+const std::set<unsigned> &FiniteAutomaton::get_initial_states() const { return m_initial_states; }
+
+const std::set<unsigned> &FiniteAutomaton::get_final_states() const { return m_final_states; }
+
+const std::map<std::pair<unsigned, char>, std::set<unsigned>> &FiniteAutomaton::get_transition_function() const
+{
+    return m_transition_function;
+}
+
 FiniteAutomaton::FiniteAutomaton(
     const std::set<char> &alphabet, const std::set<unsigned> &states, const std::set<unsigned> &initial_states,
     const std::set<unsigned> &final_states,

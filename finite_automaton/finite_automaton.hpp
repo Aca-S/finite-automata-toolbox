@@ -24,6 +24,12 @@ class FiniteAutomaton
     FiniteAutomaton determinize() const;
     FiniteAutomaton complete() const;
 
+    const std::set<char> &get_alphabet() const;
+    const std::set<unsigned> &get_states() const;
+    const std::set<unsigned> &get_initial_states() const;
+    const std::set<unsigned> &get_final_states() const;
+    const std::map<std::pair<unsigned, char>, std::set<unsigned>> &get_transition_function() const;
+
   private:
     FiniteAutomaton(
         const std::set<char> &alphabet, const std::set<unsigned> &states, const std::set<unsigned> &initial_states,
