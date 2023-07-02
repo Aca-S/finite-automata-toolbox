@@ -151,6 +151,8 @@ class FiniteAutomatonTest : public ::testing::Test
         even_num_of_a = new FiniteAutomaton(*FiniteAutomaton::construct(
             {'a', 'b'}, {0, 1}, {0}, {0}, {{{0, 'a'}, {1}}, {{0, 'b'}, {0}}, {{1, 'a'}, {0}}, {{1, 'b'}, {1}}}));
         empty_word = new FiniteAutomaton(*FiniteAutomaton::construct({}, {0}, {0}, {0}, {{{0, eps}, {0}}}));
+
+        ends_with_aab_r = new FiniteAutomaton(*FiniteAutomaton::construct("(a|b)*aab"));
     }
 
     void TearDown() override
@@ -158,11 +160,14 @@ class FiniteAutomatonTest : public ::testing::Test
         delete ends_with_ab;
         delete even_num_of_a;
         delete empty_word;
+        delete ends_with_aab_r;
     }
 
     FiniteAutomaton *ends_with_ab;
     FiniteAutomaton *even_num_of_a;
     FiniteAutomaton *empty_word;
+
+    FiniteAutomaton *ends_with_aab_r;
 };
 
 TEST_F(FiniteAutomatonTest, Accept)
@@ -184,4 +189,15 @@ TEST_F(FiniteAutomatonTest, Accept)
 
     ASSERT_TRUE(empty_word->accepts(""));
     ASSERT_FALSE(empty_word->accepts("10101"));
+}
+
+TEST_F(FiniteAutomatonTest, DeterminizeAcceptance)
+{
+    FiniteAutomaton d_ends_with_aab_r = ends_with_aab_r->determinize();
+
+    for (const auto &word : {"aab", "bababaaaaaab", "aaaaabbbbaaaaabbbaab"})
+        EXPECT_TRUE(d_ends_with_aab_r.accepts(word));
+
+    for (const auto &word : {"", "abbabababbbbaba", "aaacabbaaab"})
+        EXPECT_FALSE(d_ends_with_aab_r.accepts(word));
 }
