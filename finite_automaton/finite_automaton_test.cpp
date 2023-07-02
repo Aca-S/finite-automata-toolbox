@@ -173,22 +173,22 @@ class FiniteAutomatonTest : public ::testing::Test
 TEST_F(FiniteAutomatonTest, Accept)
 {
     for (const auto &word : {"ab", "abab", "bbbabbbaaabbabaab"})
-        ASSERT_TRUE(ends_with_ab->accepts(word));
+        EXPECT_TRUE(ends_with_ab->accepts(word));
 
     for (const auto &word : {"", "babababaqabab", "ba"})
-        ASSERT_FALSE(ends_with_ab->accepts(word));
+        EXPECT_FALSE(ends_with_ab->accepts(word));
 
     for (const auto &word : {"", "aaaa", "baaabaaab"})
-        ASSERT_TRUE(even_num_of_a->accepts(word));
+        EXPECT_TRUE(even_num_of_a->accepts(word));
 
     for (const auto &word : {"", "aaaa", "baaabaaab"})
-        ASSERT_TRUE(even_num_of_a->accepts(word));
+        EXPECT_TRUE(even_num_of_a->accepts(word));
 
     for (const auto &word : {"a", "aaabbb", "bababa"})
-        ASSERT_FALSE(even_num_of_a->accepts(word));
+        EXPECT_FALSE(even_num_of_a->accepts(word));
 
-    ASSERT_TRUE(empty_word->accepts(""));
-    ASSERT_FALSE(empty_word->accepts("10101"));
+    EXPECT_TRUE(empty_word->accepts(""));
+    EXPECT_FALSE(empty_word->accepts("10101"));
 }
 
 TEST_F(FiniteAutomatonTest, DeterminizeAcceptance)
