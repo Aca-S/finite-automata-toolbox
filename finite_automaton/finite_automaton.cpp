@@ -250,6 +250,12 @@ FiniteAutomaton FiniteAutomaton::reverse() const
     return FiniteAutomaton(m_alphabet, m_states, m_final_states, m_initial_states, reverse_transition_function);
 }
 
+FiniteAutomaton FiniteAutomaton::minimize() const
+{
+    // Brzozowski's minimization.
+    return reverse().determinize().reverse().determinize();
+}
+
 const std::set<char> &FiniteAutomaton::get_alphabet() const { return m_alphabet; }
 
 const std::set<unsigned> &FiniteAutomaton::get_states() const { return m_states; }

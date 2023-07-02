@@ -222,15 +222,15 @@ TEST_F(FiniteAutomatonTest, Complete)
 TEST_F(FiniteAutomatonTest, Reverse)
 {
     FiniteAutomaton starts_with_baa_r = ends_with_aab_r->reverse();
-    
+
     for (const auto &word : {"baa", "baaaaababbbaaaabbaaa", "baabbbb"})
         EXPECT_TRUE(starts_with_baa_r.accepts(word));
-        
+
     for (const auto &word : {"aab", "", "bababb"})
         EXPECT_FALSE(starts_with_baa_r.accepts(word));
-        
+
     FiniteAutomaton rev_even_num_of_a = even_num_of_a->reverse();
-    
+
     for (const auto &word : {"", "aaaa", "baaabaaab"})
         EXPECT_TRUE(rev_even_num_of_a.accepts(word));
 
