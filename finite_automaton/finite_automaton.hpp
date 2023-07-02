@@ -22,6 +22,7 @@ class FiniteAutomaton
     bool accepts(const std::string &word) const;
 
     FiniteAutomaton determinize() const;
+    FiniteAutomaton complete() const;
 
   private:
     FiniteAutomaton(

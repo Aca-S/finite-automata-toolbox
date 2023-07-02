@@ -192,6 +192,10 @@ FiniteAutomaton FiniteAutomaton::determinize() const
                     new_subset.merge(epsilon_closure(it->second));
             }
 
+            // This implementation supposes that deterministic
+            // automata do not have to be complete, thus an error
+            // state is not created in case there are no transitions
+            // by a symbol in the starting automaton.
             if (new_subset.empty())
                 continue;
 
@@ -206,6 +210,32 @@ FiniteAutomaton FiniteAutomaton::determinize() const
 
     return FiniteAutomaton(
         m_alphabet, determinized_states, {0}, determinized_final_states, determinized_transition_function);
+}
+
+FiniteAutomaton FiniteAutomaton::complete() const
+{
+    std::map<std::pair<unsigned, char>, std::set<unsigned>> complete_transition_function = m_transition_function;
+    std::set<unsigned> complete_states = m_states;
+
+    const auto error_state = m_states.size();
+    bool error_state_added = false;
+
+    for (const auto &state : m_states) {
+        for (const auto &symbol : m_alphabet) {
+            if (m_transition_function.find({state, symbol}) == m_transition_function.end()) {
+                error_state_added = true;
+                complete_transition_function[{state, symbol}].insert(error_state);
+            }
+        }
+    }
+
+    if (error_state_added) {
+        complete_states.insert(error_state);
+        for (const auto &symbol : m_alphabet)
+            complete_transition_function[{error_state, symbol}].insert(error_state);
+    }
+
+    return FiniteAutomaton(m_alphabet, complete_states, m_initial_states, m_final_states, complete_transition_function);
 }
 
 FiniteAutomaton::FiniteAutomaton(
