@@ -191,9 +191,17 @@ TEST_F(FiniteAutomatonTest, Accept)
     EXPECT_FALSE(empty_word->accepts("10101"));
 }
 
-TEST_F(FiniteAutomatonTest, DeterminizeAcceptance)
+TEST_F(FiniteAutomatonTest, Determinize)
 {
+    auto eps = FiniteAutomaton::epsilon_transition_value;
+
     FiniteAutomaton d_ends_with_aab_r = ends_with_aab_r->determinize();
+
+    EXPECT_TRUE(d_ends_with_aab_r.get_initial_states().size() == 1) << "DFA must have exactly one start state";
+    for (const auto &[k, v] : d_ends_with_aab_r.get_transition_function()) {
+        EXPECT_TRUE(k.second != eps) << "DFA must not contain epsilon values";
+        EXPECT_TRUE(v.size() == 1) << "DFA must have at most one transition state per alphabet symbol";
+    }
 
     for (const auto &word : {"aab", "bababaaaaaab", "aaaaabbbbaaaaabbbaab"})
         EXPECT_TRUE(d_ends_with_aab_r.accepts(word));
