@@ -209,3 +209,15 @@ TEST_F(FiniteAutomatonTest, Determinize)
     for (const auto &word : {"", "abbabababbbbaba", "aaacabbaaab"})
         EXPECT_FALSE(d_ends_with_aab_r.accepts(word));
 }
+
+TEST_F(FiniteAutomatonTest, Complete)
+{
+    FiniteAutomaton c_ends_with_aab_r = ends_with_aab_r->complete();
+    const auto &tf = c_ends_with_aab_r.get_transition_function();
+
+    for (const auto &state : c_ends_with_aab_r.get_states()) {
+        for (const auto &symbol : c_ends_with_aab_r.get_alphabet())
+            EXPECT_TRUE(tf.find({state, symbol}) != tf.end())
+                << "A complete FA must have a transition from every state by every symbol of its alphabet";
+    }
+}
