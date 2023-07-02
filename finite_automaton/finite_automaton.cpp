@@ -238,6 +238,18 @@ FiniteAutomaton FiniteAutomaton::complete() const
     return FiniteAutomaton(m_alphabet, complete_states, m_initial_states, m_final_states, complete_transition_function);
 }
 
+FiniteAutomaton FiniteAutomaton::reverse() const
+{
+    std::map<std::pair<unsigned, char>, std::set<unsigned>> reverse_transition_function;
+
+    for (const auto &[k, v] : m_transition_function) {
+        for (const auto &state : v)
+            reverse_transition_function[{state, k.second}].insert(k.first);
+    }
+
+    return FiniteAutomaton(m_alphabet, m_states, m_final_states, m_initial_states, reverse_transition_function);
+}
+
 const std::set<char> &FiniteAutomaton::get_alphabet() const { return m_alphabet; }
 
 const std::set<unsigned> &FiniteAutomaton::get_states() const { return m_states; }
