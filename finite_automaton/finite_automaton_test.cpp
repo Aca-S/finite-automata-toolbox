@@ -181,9 +181,6 @@ TEST_F(FiniteAutomatonTest, Accept)
     for (const auto &word : {"", "aaaa", "baaabaaab"})
         EXPECT_TRUE(even_num_of_a->accepts(word));
 
-    for (const auto &word : {"", "aaaa", "baaabaaab"})
-        EXPECT_TRUE(even_num_of_a->accepts(word));
-
     for (const auto &word : {"a", "aaabbb", "bababa"})
         EXPECT_FALSE(even_num_of_a->accepts(word));
 
@@ -220,4 +217,23 @@ TEST_F(FiniteAutomatonTest, Complete)
             EXPECT_TRUE(tf.find({state, symbol}) != tf.end())
                 << "A complete FA must have a transition from every state by every symbol of its alphabet";
     }
+}
+
+TEST_F(FiniteAutomatonTest, Reverse)
+{
+    FiniteAutomaton starts_with_baa_r = ends_with_aab_r->reverse();
+    
+    for (const auto &word : {"baa", "baaaaababbbaaaabbaaa", "baabbbb"})
+        EXPECT_TRUE(starts_with_baa_r.accepts(word));
+        
+    for (const auto &word : {"aab", "", "bababb"})
+        EXPECT_FALSE(starts_with_baa_r.accepts(word));
+        
+    FiniteAutomaton rev_even_num_of_a = even_num_of_a->reverse();
+    
+    for (const auto &word : {"", "aaaa", "baaabaaab"})
+        EXPECT_TRUE(rev_even_num_of_a.accepts(word));
+
+    for (const auto &word : {"a", "aaabbb", "bababa"})
+        EXPECT_FALSE(rev_even_num_of_a.accepts(word));
 }
