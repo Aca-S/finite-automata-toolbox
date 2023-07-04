@@ -3,16 +3,28 @@ project(finite_automata_toolbox)
 
 set(CMAKE_CXX_STANDARD 23)
 
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
+qt_standard_project_setup()
+
 add_subdirectory(finite_automaton)
 
-add_executable(
+qt_add_executable(
     fat
     main.cpp
+    main_window.cpp
+    main_window.ui
 )
 
 target_link_libraries(
     fat 
     PUBLIC finite_automaton
+    PRIVATE Qt6::Widgets
+)
+
+set_target_properties(
+    fat PROPERTIES
+    WIN32_EXECUTABLE ON
+    MACOSX_BUNDLE ON
 )
 
 target_include_directories(
