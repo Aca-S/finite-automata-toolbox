@@ -9,4 +9,5 @@ qt_add_library(
 target_link_libraries(
     qt_graph
     PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+    PUBLIC cgraph gvc
 )
