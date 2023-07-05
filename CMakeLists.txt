@@ -7,6 +7,7 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 qt_standard_project_setup()
 
 add_subdirectory(finite_automaton)
+add_subdirectory(qt_graph)
 
 qt_add_executable(
     fat
@@ -18,6 +19,7 @@ qt_add_executable(
 target_link_libraries(
     fat 
     PUBLIC finite_automaton
+    PUBLIC qt_graph
     PRIVATE Qt6::Widgets
 )
 
@@ -31,6 +33,7 @@ target_include_directories(
     fat PUBLIC
     "${PROJECT_BINARY_DIR}"
     "${PROJECT_SOURCE_DIR}/finite_automaton"
+    "${PROJECT_SOURCE_DIR}/qt_graph"
 )
 
 # Setting up GoogleTest
