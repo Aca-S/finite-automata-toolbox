@@ -4,6 +4,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 qt_add_library(
     qt_graph
     graph.cpp
+    node.cpp
 )
 
 target_link_libraries(
