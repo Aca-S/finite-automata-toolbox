@@ -15,7 +15,7 @@ class Graph : public QGraphicsItem
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void add_node(Node *node);
+    bool add_node(Node *node);
 
   private:
     class Context

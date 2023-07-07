@@ -34,13 +34,19 @@ void Graph::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     painter->drawRect(boundingRect());
 }
 
-void Graph::add_node(Node *node)
+bool Graph::add_node(Node *node)
 {
+    // A node cannot be reassigned to a different graph.
+    if (node->parentItem())
+        return false;
+
     node->setParentItem(this);
     node->m_gv_node = agnode(m_gv_graph, const_cast<char *>(std::to_string(m_nodes.size()).c_str()), 1);
     node->setup();
     m_nodes.append(node);
     update_layout();
+
+    return true;
 }
 
 void Graph::update_layout() { gvLayout(m_context.m_gv_context, m_gv_graph, "dot"); }
