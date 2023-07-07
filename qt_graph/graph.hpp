@@ -4,18 +4,21 @@
 #include <QGraphicsItem>
 #include <graphviz/gvc.h>
 
-class Node;
+#include "node.hpp"
 
 class Graph : public QGraphicsItem
 {
-    friend class Node;
-
   public:
     Graph();
     ~Graph();
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+    void add_node(Node *node);
+
+    static QPointF gv_to_qt_coords(const QPointF &gv_point);
+    static qreal gv_to_qt_size(const qreal &gv_size);
 
   private:
     class Context
@@ -27,15 +30,10 @@ class Graph : public QGraphicsItem
         GVC_t *m_gv_context;
     };
 
-    static QPointF gv_to_qt_coords(const QPointF &gv_point);
-    static qreal gv_to_qt_size(const qreal &gv_size);
-
     void update_layout();
 
     static Context m_context;
-
     QVector<Node *> m_nodes;
-
     Agraph_t *m_gv_graph;
 };
 

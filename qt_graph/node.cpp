@@ -2,16 +2,9 @@
 
 #include <QPainter>
 
-Node::Node(Graph *parent_graph, const QString &label)
-    : QGraphicsItem(parent_graph),
-      m_gv_node(agnode(
-          parent_graph->m_gv_graph, const_cast<char *>(std::to_string(parent_graph->m_nodes.size()).c_str()), 1)),
-      m_label(label)
-{
-    agset(m_gv_node, const_cast<char *>("label"), const_cast<char *>(m_label.toUtf8().constData()));
-    parent_graph->m_nodes.append(this);
-    parent_graph->update_layout();
-}
+#include "graph.hpp"
+
+Node::Node(const QString &label) : m_label(label) {}
 
 QRectF Node::boundingRect() const
 {
@@ -29,3 +22,5 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 {
     painter->drawRect(boundingRect());
 }
+
+void Node::setup() { agset(m_gv_node, const_cast<char *>("label"), const_cast<char *>(m_label.toUtf8().constData())); }
