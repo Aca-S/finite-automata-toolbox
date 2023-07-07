@@ -23,4 +23,4 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     painter->drawRect(boundingRect());
 }
 
-void Node::setup() { agset(m_gv_node, const_cast<char *>("label"), const_cast<char *>(m_label.toUtf8().constData())); }
+void Node::setup() { Utility::set_gv_attribute(m_gv_node, "label", m_label); }

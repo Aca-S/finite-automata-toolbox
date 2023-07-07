@@ -10,7 +10,11 @@ Graph::Context::~Context() { gvFreeContext(m_gv_context); }
 
 Graph::Context Graph::m_context;
 
-Graph::Graph() : QGraphicsItem(), m_gv_graph(agopen(const_cast<char *>(""), Agdirected, 0)) { update_layout(); }
+Graph::Graph() : QGraphicsItem(), m_gv_graph(agopen(const_cast<char *>(""), Agdirected, 0))
+{
+    Utility::set_gv_attribute(m_gv_graph, "splines", "true");
+    update_layout();
+}
 
 Graph::~Graph()
 {
