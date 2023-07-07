@@ -14,8 +14,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     Graph *g = new Graph();
     Node *n_1 = new Node("abc");
     Node *n_2 = new Node("qwe");
+    Edge *e_1_2 = new Edge("edge_label");
     g->add_node(n_1);
     g->add_node(n_2);
+    g->add_edge(e_1_2, n_1, n_2);
     scene->addItem(g);
 }
 

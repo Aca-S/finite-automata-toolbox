@@ -5,6 +5,7 @@ qt_add_library(
     qt_graph
     graph.cpp
     node.cpp
+    edge.cpp
     utility.cpp
 )
 

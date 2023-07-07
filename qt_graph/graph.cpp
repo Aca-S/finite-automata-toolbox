@@ -49,4 +49,20 @@ bool Graph::add_node(Node *node)
     return true;
 }
 
+bool Graph::add_edge(Edge *edge, Node *source, Node *destination)
+{
+    if (source->parentItem() != this || destination->parentItem() != this)
+        return false;
+
+    edge->setParentItem(this);
+    edge->m_gv_edge = agedge(
+        m_gv_graph, source->m_gv_node, destination->m_gv_node,
+        const_cast<char *>(std::to_string(m_edges.size()).c_str()), 1);
+    edge->setup();
+    m_edges.append(edge);
+    update_layout();
+
+    return true;
+}
+
 void Graph::update_layout() { gvLayout(m_context.m_gv_context, m_gv_graph, "dot"); }
