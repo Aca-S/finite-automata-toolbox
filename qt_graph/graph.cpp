@@ -24,8 +24,8 @@ Graph::~Graph()
 
 QRectF Graph::boundingRect() const
 {
-    QPointF bottom_left = Utility::gv_to_qt_coords({GD_bb(m_gv_graph).LL.x, GD_bb(m_gv_graph).LL.y});
-    QPointF top_right = Utility::gv_to_qt_coords({GD_bb(m_gv_graph).UR.x, GD_bb(m_gv_graph).UR.y});
+    QPointF bottom_left = Utility::gv_to_qt_coords(GD_bb(m_gv_graph).LL);
+    QPointF top_right = Utility::gv_to_qt_coords(GD_bb(m_gv_graph).UR);
 
     QPointF top_left = {bottom_left.x(), top_right.y()};
     QPointF bottom_right = {top_right.x(), bottom_left.y()};
@@ -66,10 +66,13 @@ bool Graph::add_edge(Edge *edge, Node *source, Node *destination)
     m_edges.append(edge);
     update_layout();
 
-    for (Edge *e : m_edges)
-        e->update_positions();
-
     return true;
 }
 
-void Graph::update_layout() { gvLayout(m_context.m_gv_context, m_gv_graph, "dot"); }
+void Graph::update_layout()
+{
+    gvLayout(m_context.m_gv_context, m_gv_graph, "dot");
+
+    for (Edge *e : m_edges)
+        e->update_positions();
+}
