@@ -9,7 +9,7 @@ class Edge : public QGraphicsItem
     friend class Graph;
 
   public:
-    Edge(const QString &label, bool has_source_arrow = false, bool has_destination_arrow = true);
+    Edge(const QString &label);
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -19,8 +19,6 @@ class Edge : public QGraphicsItem
     void update_positions();
 
     QString m_label;
-    bool m_has_source_arrow;
-    bool m_has_destination_arrow;
     QPainterPath m_path;
     Agedge_t *m_gv_edge;
 };

@@ -4,10 +4,7 @@
 
 #include "utility.hpp"
 
-Edge::Edge(const QString &label, bool has_source_arrow, bool has_destination_arrow)
-    : m_label(label), m_has_source_arrow(has_source_arrow), m_has_destination_arrow(has_destination_arrow)
-{
-}
+Edge::Edge(const QString &label) : m_label(label) {}
 
 QRectF Edge::boundingRect() const { return m_path.boundingRect(); }
 
