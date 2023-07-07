@@ -2,6 +2,8 @@
 
 #include <QPainter>
 
+#include "utility.hpp"
+
 Graph::Context::Context() : m_gv_context(gvContext()) {}
 
 Graph::Context::~Context() { gvFreeContext(m_gv_context); }
@@ -18,8 +20,8 @@ Graph::~Graph()
 
 QRectF Graph::boundingRect() const
 {
-    QPointF bottom_left = gv_to_qt_coords({GD_bb(m_gv_graph).LL.x, GD_bb(m_gv_graph).LL.y});
-    QPointF top_right = gv_to_qt_coords({GD_bb(m_gv_graph).UR.x, GD_bb(m_gv_graph).UR.y});
+    QPointF bottom_left = Utility::gv_to_qt_coords({GD_bb(m_gv_graph).LL.x, GD_bb(m_gv_graph).LL.y});
+    QPointF top_right = Utility::gv_to_qt_coords({GD_bb(m_gv_graph).UR.x, GD_bb(m_gv_graph).UR.y});
 
     QPointF top_left = {bottom_left.x(), top_right.y()};
     QPointF bottom_right = {top_right.x(), bottom_left.y()};
@@ -42,11 +44,3 @@ void Graph::add_node(Node *node)
 }
 
 void Graph::update_layout() { gvLayout(m_context.m_gv_context, m_gv_graph, "dot"); }
-
-QPointF Graph::gv_to_qt_coords(const QPointF &gv_point)
-{
-    static const qreal dpi_adjustment = 92.0 / 72.0;
-    return {dpi_adjustment * gv_point.x(), -dpi_adjustment * gv_point.y()};
-}
-
-qreal Graph::gv_to_qt_size(const qreal &gv_size) { return 92.0 * gv_size; }

@@ -17,9 +17,6 @@ class Graph : public QGraphicsItem
 
     void add_node(Node *node);
 
-    static QPointF gv_to_qt_coords(const QPointF &gv_point);
-    static qreal gv_to_qt_size(const qreal &gv_size);
-
   private:
     class Context
     {

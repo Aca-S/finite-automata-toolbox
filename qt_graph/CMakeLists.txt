@@ -5,6 +5,7 @@ qt_add_library(
     qt_graph
     graph.cpp
     node.cpp
+    utility.cpp
 )
 
 target_link_libraries(
