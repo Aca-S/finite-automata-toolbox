@@ -66,6 +66,9 @@ bool Graph::add_edge(Edge *edge, Node *source, Node *destination)
     m_edges.append(edge);
     update_layout();
 
+    for (Edge *e : m_edges)
+        e->update_positions();
+
     return true;
 }
 

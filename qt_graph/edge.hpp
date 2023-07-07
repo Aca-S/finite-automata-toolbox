@@ -16,10 +16,12 @@ class Edge : public QGraphicsItem
 
   private:
     void setup();
+    void update_positions();
 
     QString m_label;
     bool m_has_source_arrow;
     bool m_has_destination_arrow;
+    QPainterPath m_path;
     Agedge_t *m_gv_edge;
 };
 
