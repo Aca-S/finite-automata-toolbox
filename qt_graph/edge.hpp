@@ -1,6 +1,7 @@
 #ifndef EDGE_HPP
 #define EDGE_HPP
 
+#include <QFont>
 #include <QGraphicsItem>
 #include <graphviz/gvc.h>
 
@@ -9,7 +10,7 @@ class Edge : public QGraphicsItem
     friend class Graph;
 
   public:
-    Edge(const QString &label);
+    Edge(const QString &label, const QFont &label_font = QFont("Times-Roman", 14));
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -19,7 +20,11 @@ class Edge : public QGraphicsItem
     void update_positions();
 
     QString m_label;
+    QFont m_label_font;
+
     QPainterPath m_path;
+    QPointF m_label_position;
+
     Agedge_t *m_gv_edge;
 };
 

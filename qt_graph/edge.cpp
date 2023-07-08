@@ -2,18 +2,32 @@
 
 #include <QPainter>
 
+#include <iostream>
+
 #include "utility.hpp"
 
-Edge::Edge(const QString &label) : m_label(label) {}
+Edge::Edge(const QString &label, const QFont &label_font) : m_label(label), m_label_font(label_font) {}
 
-QRectF Edge::boundingRect() const { return m_path.boundingRect(); }
+QRectF Edge::boundingRect() const
+{
+    QRectF label_br =
+        QFontMetrics(m_label_font).boundingRect(m_label).translated(m_label_position.x(), m_label_position.y());
+    return m_path.boundingRect() | label_br;
+}
 
 void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->drawPath(m_path);
+    painter->setFont(m_label_font);
+    painter->drawText(m_label_position, m_label);
 }
 
-void Edge::setup() { Utility::set_gv_attribute(m_gv_edge, "label", m_label); }
+void Edge::setup()
+{
+    Utility::set_gv_attribute(m_gv_edge, "label", m_label);
+    Utility::set_gv_attribute(m_gv_edge, "fontname", m_label_font.family());
+    Utility::set_gv_attribute(m_gv_edge, "fontsize", QString::number(m_label_font.pointSize()));
+}
 
 void Edge::update_positions()
 {
@@ -38,4 +52,7 @@ void Edge::update_positions()
         QPolygonF arrowhead({arrow_start - arrowhead_vector, arrow_end, arrow_start + arrowhead_vector});
         m_path.addPolygon(arrowhead);
     }
+
+    m_label_position = gv_to_qt_coords(ED_label(m_gv_edge)->pos)
+                       + QPointF(-ED_label(m_gv_edge)->dimen.x / 2.0, ED_label(m_gv_edge)->dimen.y / 2.0);
 }
