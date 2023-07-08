@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     g->add_node(n_1);
     g->add_node(n_2);
     g->add_edge(e_1_2, n_1, n_2);
+    g->compose_layout();
     scene->addItem(g);
 }
 

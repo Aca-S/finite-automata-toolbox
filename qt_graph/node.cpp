@@ -49,5 +49,6 @@ void Node::update_positions()
 
     m_path.addEllipse(QRectF(top_left, bottom_right));
 
-    m_label_position = m_path.boundingRect().center() - gv_to_qt_coords(ND_label(m_gv_node)->dimen) / 2.0;
+    if (m_label != "")
+        m_label_position = m_path.boundingRect().center() - gv_to_qt_coords(ND_label(m_gv_node)->dimen) / 2.0;
 }
