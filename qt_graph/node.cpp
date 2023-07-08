@@ -4,7 +4,10 @@
 
 #include "utility.hpp"
 
-Node::Node(const QString &label) : m_label(label) {}
+Node::Node(qreal width, qreal height, const QString &label, const QFont &label_font)
+    : m_width(width), m_height(height), m_label(label), m_label_font(label_font)
+{
+}
 
 QRectF Node::boundingRect() const
 {
@@ -23,4 +26,12 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     painter->drawRect(boundingRect());
 }
 
-void Node::setup() { Utility::set_gv_attribute(m_gv_node, "label", m_label); }
+void Node::setup()
+{
+    Utility::set_gv_attribute(m_gv_node, "fixedsize", "true");
+    Utility::set_gv_attribute(m_gv_node, "width", QString::number(m_width / 92.0));
+    Utility::set_gv_attribute(m_gv_node, "height", QString::number(m_height / 92.0));
+    Utility::set_gv_attribute(m_gv_node, "label", m_label);
+    Utility::set_gv_attribute(m_gv_node, "fontname", m_label_font.family());
+    Utility::set_gv_attribute(m_gv_node, "fontsize", QString::number(m_label_font.pointSize()));
+}

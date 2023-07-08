@@ -12,8 +12,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->main_view->setScene(scene);
     scene->addEllipse(0, 0, 10, 10);
     Graph *g = new Graph();
-    Node *n_1 = new Node("abc");
-    Node *n_2 = new Node("qwe");
+    Node *n_1 = new Node(50, 50, "abc");
+    Node *n_2 = new Node(50, 50, "qwe");
     Edge *e_1_2 = new Edge("a");
     g->add_node(n_1);
     g->add_node(n_2);
