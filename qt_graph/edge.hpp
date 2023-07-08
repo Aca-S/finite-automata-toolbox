@@ -10,7 +10,7 @@ class Edge : public QGraphicsItem
     friend class Graph;
 
   public:
-    Edge(const QString &label, const QFont &label_font = QFont("Times-Roman", 14));
+    Edge(const QString &label, const QFont &label_font = QFont("Times-Roman", 12));
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

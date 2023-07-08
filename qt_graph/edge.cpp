@@ -2,8 +2,6 @@
 
 #include <QPainter>
 
-#include <iostream>
-
 #include "utility.hpp"
 
 Edge::Edge(const QString &label, const QFont &label_font) : m_label(label), m_label_font(label_font) {}
@@ -53,6 +51,6 @@ void Edge::update_positions()
         m_path.addPolygon(arrowhead);
     }
 
-    m_label_position = gv_to_qt_coords(ED_label(m_gv_edge)->pos)
-                       + QPointF(-ED_label(m_gv_edge)->dimen.x / 2.0, ED_label(m_gv_edge)->dimen.y / 2.0);
+    // TODO: Long edge labels could start extending out of graph bounds. Fix this.
+    m_label_position = gv_to_qt_coords(ED_label(m_gv_edge)->pos) - gv_to_qt_coords(ED_label(m_gv_edge)->dimen) / 2.0;
 }
