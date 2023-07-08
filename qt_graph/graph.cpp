@@ -13,7 +13,6 @@ Graph::Context Graph::m_context;
 Graph::Graph() : QGraphicsItem(), m_gv_graph(agopen(const_cast<char *>(""), Agdirected, 0))
 {
     Utility::set_gv_attribute(m_gv_graph, "splines", "true");
-    update_layout();
 }
 
 Graph::~Graph()
@@ -48,7 +47,6 @@ bool Graph::add_node(Node *node)
     node->m_gv_node = agnode(m_gv_graph, const_cast<char *>(std::to_string(m_nodes.size()).c_str()), 1);
     node->setup();
     m_nodes.append(node);
-    update_layout();
 
     return true;
 }
@@ -64,13 +62,15 @@ bool Graph::add_edge(Edge *edge, Node *source, Node *destination)
         const_cast<char *>(std::to_string(m_edges.size()).c_str()), 1);
     edge->setup();
     m_edges.append(edge);
-    update_layout();
 
     return true;
 }
 
-void Graph::update_layout()
+// Must be called exactly once - after adding all of the nodes and edges
+// and before placing on a scene.
+void Graph::compose_layout()
 {
+    gvFreeLayout(m_context.m_gv_context, m_gv_graph);
     gvLayout(m_context.m_gv_context, m_gv_graph, "dot");
 
     for (Node *n : m_nodes)

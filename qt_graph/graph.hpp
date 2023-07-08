@@ -18,6 +18,7 @@ class Graph : public QGraphicsItem
 
     bool add_node(Node *node);
     bool add_edge(Edge *edge, Node *source, Node *destination);
+    void compose_layout();
 
   private:
     class Context
@@ -28,8 +29,6 @@ class Graph : public QGraphicsItem
 
         GVC_t *m_gv_context;
     };
-
-    void update_layout();
 
     static Context m_context;
     QVector<Node *> m_nodes;
