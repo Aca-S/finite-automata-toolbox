@@ -31,6 +31,8 @@ void Edge::update_positions()
 {
     using namespace Utility;
 
+    m_path.clear();
+
     bezier *curve_data = ED_spl(m_gv_edge)->list;
 
     m_path.moveTo(gv_to_qt_coords(curve_data->list[0]));
