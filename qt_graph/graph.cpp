@@ -73,6 +73,9 @@ void Graph::update_layout()
 {
     gvLayout(m_context.m_gv_context, m_gv_graph, "dot");
 
+    for (Node *n : m_nodes)
+        n->update_positions();
+
     for (Edge *e : m_edges)
         e->update_positions();
 }

@@ -17,11 +17,15 @@ class Node : public QGraphicsItem
 
   private:
     void setup();
+    void update_positions();
 
     qreal m_width;
     qreal m_height;
     QString m_label;
     QFont m_label_font;
+
+    QPainterPath m_path;
+    QPointF m_label_position;
 
     Agnode_t *m_gv_node;
 };

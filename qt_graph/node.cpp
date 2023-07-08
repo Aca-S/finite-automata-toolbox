@@ -1,6 +1,7 @@
 #include "node.hpp"
 
 #include <QPainter>
+#include <iostream>
 
 #include "utility.hpp"
 
@@ -11,19 +12,16 @@ Node::Node(qreal width, qreal height, const QString &label, const QFont &label_f
 
 QRectF Node::boundingRect() const
 {
-    qreal width = Utility::gv_to_qt_size(ND_width(m_gv_node));
-    qreal height = Utility::gv_to_qt_size(ND_height(m_gv_node));
-    QPointF center = Utility::gv_to_qt_coords(ND_coord(m_gv_node));
-
-    QPointF top_left = {center.x() - width / 2.0, center.y() - height / 2.0};
-    QPointF bottom_right = {top_left.x() + width, top_left.y() + height};
-
-    return QRectF(top_left, bottom_right);
+    QRectF label_br =
+        QFontMetrics(m_label_font).boundingRect(m_label).translated(m_label_position.x(), m_label_position.y());
+    return m_path.boundingRect() | label_br;
 }
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    painter->drawRect(boundingRect());
+    painter->drawPath(m_path);
+    painter->setFont(m_label_font);
+    painter->drawText(m_label_position, m_label);
 }
 
 void Node::setup()
@@ -34,4 +32,22 @@ void Node::setup()
     Utility::set_gv_attribute(m_gv_node, "label", m_label);
     Utility::set_gv_attribute(m_gv_node, "fontname", m_label_font.family());
     Utility::set_gv_attribute(m_gv_node, "fontsize", QString::number(m_label_font.pointSize()));
+}
+
+void Node::update_positions()
+{
+    using namespace Utility;
+
+    m_path.clear();
+
+    qreal width = gv_to_qt_size(ND_width(m_gv_node));
+    qreal height = gv_to_qt_size(ND_height(m_gv_node));
+    QPointF center = gv_to_qt_coords(ND_coord(m_gv_node));
+
+    QPointF top_left = {center.x() - width / 2.0, center.y() - height / 2.0};
+    QPointF bottom_right = {top_left.x() + width, top_left.y() + height};
+
+    m_path.addEllipse(QRectF(top_left, bottom_right));
+
+    m_label_position = m_path.boundingRect().center() - gv_to_qt_coords(ND_label(m_gv_node)->dimen) / 2.0;
 }
