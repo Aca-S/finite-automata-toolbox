@@ -53,7 +53,8 @@ void Edge::update_positions()
         m_path.addPolygon(arrowhead);
     }
 
-    // TODO: Long edge labels could start extending out of graph bounds. Fix this.
+    // Long edge labels as rendered by Qt don't correspond perfectly to Graphviz's labels,
+    // so some overlap on longer labels is possible.
     if (m_label != "")
         m_label_position =
             gv_to_qt_coords(ED_label(m_gv_edge)->pos) - gv_to_qt_coords(ED_label(m_gv_edge)->dimen) / 2.0;

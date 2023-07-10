@@ -23,19 +23,13 @@ Graph::~Graph()
 
 QRectF Graph::boundingRect() const
 {
-    QPointF bottom_left = Utility::gv_to_qt_coords(GD_bb(m_gv_graph).LL);
-    QPointF top_right = Utility::gv_to_qt_coords(GD_bb(m_gv_graph).UR);
-
-    QPointF top_left = {bottom_left.x(), top_right.y()};
-    QPointF bottom_right = {top_right.x(), bottom_left.y()};
-
-    return QRectF(top_left, bottom_right);
+    // Due to the possible difference in Qt's and Graphviz's labels,
+    // we won't use Graphviz's bounding box data, and instead we'll
+    // calculate it ourselves in the layout composition phase.
+    return m_bounding_rectangle;
 }
 
-void Graph::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    painter->drawRect(boundingRect());
-}
+void Graph::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {}
 
 bool Graph::add_node(Node *node)
 {
@@ -73,9 +67,15 @@ void Graph::compose_layout()
     gvFreeLayout(m_context.m_gv_context, m_gv_graph);
     gvLayout(m_context.m_gv_context, m_gv_graph, "dot");
 
-    for (Node *n : m_nodes)
-        n->update_positions();
+    m_bounding_rectangle = QRectF();
 
-    for (Edge *e : m_edges)
+    for (Node *n : m_nodes) {
+        n->update_positions();
+        m_bounding_rectangle |= n->boundingRect();
+    }
+
+    for (Edge *e : m_edges) {
         e->update_positions();
+        m_bounding_rectangle |= e->boundingRect();
+    }
 }

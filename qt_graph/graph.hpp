@@ -30,6 +30,8 @@ class Graph : public QGraphicsItem
         GVC_t *m_gv_context;
     };
 
+    QRectF m_bounding_rectangle;
+
     static Context m_context;
     QVector<Node *> m_nodes;
     QVector<Edge *> m_edges;
