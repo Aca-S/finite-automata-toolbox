@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 project(finite_automata_toolbox)
 
 set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 qt_standard_project_setup()

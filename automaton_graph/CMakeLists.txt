@@ -7,6 +7,7 @@ qt_add_library(
     double_circle_node.cpp
     invisible_node.cpp
     transition_edge.cpp
+    automaton_graph.cpp
 )
 
 target_link_libraries(
