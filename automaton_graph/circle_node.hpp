@@ -3,7 +3,7 @@
 
 #include "node.hpp"
 
-// Graphical representation of non-final automaton nodes.
+// Graphical representation of non-final state automaton nodes.
 class CircleNode : public Node
 {
   public:

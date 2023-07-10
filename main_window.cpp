@@ -2,6 +2,7 @@
 #include "./ui_main_window.h"
 
 #include "circle_node.hpp"
+#include "double_circle_node.hpp"
 #include "graph.hpp"
 #include "node.hpp"
 
@@ -14,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     scene->addEllipse(0, 0, 10, 10);
     Graph *g = new Graph();
     Node *n_1 = new CircleNode(50, "0");
-    Node *n_2 = new Node(50, 50, "1");
+    Node *n_2 = new DoubleCircleNode(50, 42, "1");
     Edge *e_1_2 = new Edge("a");
     g->add_node(n_1);
     g->add_node(n_2);

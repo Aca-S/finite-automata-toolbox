@@ -4,6 +4,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 qt_add_library(
     automaton_graph
     circle_node.cpp
+    double_circle_node.cpp
 )
 
 target_link_libraries(
