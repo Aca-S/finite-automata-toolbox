@@ -13,6 +13,7 @@ Graph::Context Graph::m_context;
 Graph::Graph() : QGraphicsItem(), m_gv_graph(agopen(const_cast<char *>(""), Agdirected, 0))
 {
     Utility::set_gv_attribute(m_gv_graph, "splines", "true");
+    Utility::set_gv_attribute(m_gv_graph, "rankdir", "LR");
 }
 
 Graph::~Graph()
