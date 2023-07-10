@@ -8,6 +8,7 @@ qt_standard_project_setup()
 
 add_subdirectory(finite_automaton)
 add_subdirectory(qt_graph)
+add_subdirectory(automaton_graph)
 
 qt_add_executable(
     fat
@@ -20,6 +21,7 @@ target_link_libraries(
     fat 
     PUBLIC finite_automaton
     PUBLIC qt_graph
+    PUBLIC automaton_graph
     PRIVATE Qt6::Widgets
 )
 
@@ -34,6 +36,7 @@ target_include_directories(
     "${PROJECT_BINARY_DIR}"
     "${PROJECT_SOURCE_DIR}/finite_automaton"
     "${PROJECT_SOURCE_DIR}/qt_graph"
+    "${PROJECT_SOURCE_DIR}/automaton_graph"
 )
 
 # Setting up GoogleTest
