@@ -55,7 +55,9 @@ void Edge::update_positions()
 
     // Long edge labels as rendered by Qt don't correspond perfectly to Graphviz's labels,
     // so some overlap on longer labels is possible.
-    if (m_label != "")
-        m_label_position =
-            gv_to_qt_coords(ED_label(m_gv_edge)->pos) - gv_to_qt_coords(ED_label(m_gv_edge)->dimen) / 2.0;
+    if (m_label != "") {
+        QPointF center_position = gv_to_qt_coords(ED_label(m_gv_edge)->pos);
+        QPointF label_dim = gv_to_qt_coords(ED_label(m_gv_edge)->dimen);
+        m_label_position = {center_position.x() - label_dim.x() / 2.0, center_position.y()};
+    }
 }
