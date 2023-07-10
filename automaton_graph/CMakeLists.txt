@@ -5,6 +5,7 @@ qt_add_library(
     automaton_graph
     circle_node.cpp
     double_circle_node.cpp
+    invisible_node.cpp
     transition_edge.cpp
 )
 
