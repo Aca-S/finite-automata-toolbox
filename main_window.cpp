@@ -5,6 +5,7 @@
 #include "double_circle_node.hpp"
 #include "graph.hpp"
 #include "node.hpp"
+#include "transition_edge.hpp"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -16,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     Graph *g = new Graph();
     Node *n_1 = new CircleNode(50, "0");
     Node *n_2 = new DoubleCircleNode(50, 42, "1");
-    Edge *e_1_2 = new Edge("a");
+    Edge *e_1_2 = new TransitionEdge("a");
     g->add_node(n_1);
     g->add_node(n_2);
     g->add_edge(e_1_2, n_1, n_2);
