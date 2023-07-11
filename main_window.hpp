@@ -18,6 +18,8 @@ class MainWindow : public QMainWindow
     ~MainWindow();
 
   private:
+    void setup_validators();
+
     Ui::MainWindow *ui;
 };
 
