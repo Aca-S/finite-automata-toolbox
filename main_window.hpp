@@ -20,6 +20,7 @@ class MainWindow : public QMainWindow
   private:
     void setup_construction_dock();
     void construct_by_element();
+    void construct_by_regex();
 
     Ui::MainWindow *ui;
 };

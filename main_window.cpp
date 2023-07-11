@@ -75,12 +75,24 @@ void MainWindow::setup_construction_dock()
         ui->transition_le, transition_validator, ui->construction_by_element_info,
         "The transition input must be in the form of <state symbol state>.");
 
+    QString symbol_regex = "[ -~]";
+    QRegularExpression symbols_only_regex("^" + symbol_regex + "*$");
+    auto regex_validator = new QRegularExpressionValidator(symbols_only_regex, this);
+    set_validator(
+        ui->regex_construction_le, regex_validator, ui->construction_by_regex_info,
+        "Only printable ASCII symbols are allowed in the RegEx.");
+
     connect(ui->transition_btn, &QPushButton::clicked, ui->transition_list, [=]() {
         if (ui->transition_le->hasAcceptableInput())
             ui->transition_list->addItem(ui->transition_le->text());
     });
 
-    connect(ui->construct_btn, &QPushButton::clicked, this, [=]() { construct_by_element(); });
+    connect(ui->construct_btn, &QPushButton::clicked, this, [=]() {
+        if (ui->by_element_rb->isChecked())
+            construct_by_element();
+        else if (ui->by_regex_rb->isChecked())
+            construct_by_regex();
+    });
 }
 
 void MainWindow::construct_by_element()
@@ -130,4 +142,15 @@ void MainWindow::construct_by_element()
         ui->main_view->scene()->addItem(graph);
     } else
         ui->construction_by_element_info->setText(QString::fromUtf8(automaton.error().c_str()));
+}
+
+void MainWindow::construct_by_regex()
+{
+    std::string regex(ui->regex_construction_le->text().toUtf8().constData());
+    auto automaton = FiniteAutomaton::construct(regex);
+    if (automaton) {
+        auto graph = new AutomatonGraph(*automaton);
+        ui->main_view->scene()->addItem(graph);
+    } else
+        ui->construction_by_regex_info->setText(QString::fromUtf8(automaton.error().c_str()));
 }
