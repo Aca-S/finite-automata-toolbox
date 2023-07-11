@@ -181,6 +181,9 @@
          <property name="title">
           <string>By element</string>
          </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="0" column="0">
            <layout class="QGridLayout" name="construction_by_element_layout">

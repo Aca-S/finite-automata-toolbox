@@ -14,10 +14,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     setup_validators();
 
-    QGraphicsScene *scene = new QGraphicsScene(this);
+    connect(ui->transition_btn, &QPushButton::clicked, ui->transition_list, [=]() {
+        if (ui->transition_le->hasAcceptableInput())
+            ui->transition_list->addItem(ui->transition_le->text());
+    });
+
+    /*QGraphicsScene *scene = new QGraphicsScene(this);
     ui->main_view->setScene(scene);
     AutomatonGraph *g = new AutomatonGraph(*FiniteAutomaton::construct("(a|b)*"));
-    scene->addItem(g);
+    scene->addItem(g);*/
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -35,12 +40,10 @@ void set_validator(
         QObject::connect(
             line_edit, &QLineEdit::inputRejected, info_label, [=]() { info_label->setText(info_message); });
         QObject::connect(qApp, &QApplication::focusChanged, info_label, [=](auto *old) {
-            if (old == line_edit) {
-                QString text = line_edit->text();
-                int pos = 0;
-                if (validator->validate(text, pos) != QValidator::Acceptable)
-                    info_label->setText(info_message);
-            }
+            if (old == line_edit && !line_edit->hasAcceptableInput())
+                info_label->setText(info_message);
+            else if (old == line_edit)
+                info_label->setText(""); // Last input was rejected, but without it, the text would be valid.
         });
     }
 }
