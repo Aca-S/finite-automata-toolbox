@@ -18,7 +18,8 @@ class MainWindow : public QMainWindow
     ~MainWindow();
 
   private:
-    void setup_validators();
+    void setup_construction_dock();
+    void construct_by_element();
 
     Ui::MainWindow *ui;
 };
