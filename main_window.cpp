@@ -17,11 +17,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->main_view->setScene(scene);
 
     setup_construction_dock();
-
-    /*QGraphicsScene *scene = new QGraphicsScene(this);
-    ui->main_view->setScene(scene);
-    AutomatonGraph *g = new AutomatonGraph(*FiniteAutomaton::construct("(a|b)*"));
-    scene->addItem(g);*/
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -50,10 +45,12 @@ void set_validator(
 
 void MainWindow::setup_construction_dock()
 {
+    QString symbol_regex = "[ -~]"; // Printable ASCII characters.
     QString unsigned_regex = "(0|[1-9]\\d*)";
-    QRegularExpression sym_list_regex("^(\\w( \\w)*)?$");
+
+    QRegularExpression sym_list_regex("^(" + symbol_regex + "( " + symbol_regex + ")*)?$");
     QRegularExpression num_list_regex("^(" + unsigned_regex + "( " + unsigned_regex + ")*)?$");
-    QRegularExpression transition_regex("^" + unsigned_regex + " \\w " + unsigned_regex + "$");
+    QRegularExpression transition_regex("^" + unsigned_regex + " " + symbol_regex + " " + unsigned_regex + "$");
 
     auto alphabet_validator = new QRegularExpressionValidator(sym_list_regex, this);
     auto states_validator = new QRegularExpressionValidator(num_list_regex, this);
@@ -61,7 +58,7 @@ void MainWindow::setup_construction_dock()
 
     set_validator(
         ui->alphabet_le, alphabet_validator, ui->construction_by_element_info,
-        "The alphabet input must be a space separated list of ASCII characters.");
+        "The alphabet input must be a space separated list of printable ASCII characters.");
     set_validator(
         ui->states_le, states_validator, ui->construction_by_element_info,
         "The states input must be a space separated list of numbers.");
@@ -75,7 +72,6 @@ void MainWindow::setup_construction_dock()
         ui->transition_le, transition_validator, ui->construction_by_element_info,
         "The transition input must be in the form of <state symbol state>.");
 
-    QString symbol_regex = "[ -~]";
     QRegularExpression symbols_only_regex("^" + symbol_regex + "*$");
     auto regex_validator = new QRegularExpressionValidator(symbols_only_regex, this);
     set_validator(
