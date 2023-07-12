@@ -13,6 +13,10 @@ class MainGraphicsView : public QGraphicsView
   protected:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
+
+  private:
+    qreal m_current_scale_factor = 1.0;
 };
 
 #endif // MAIN_GRAPHICS_VIEW_HPP
