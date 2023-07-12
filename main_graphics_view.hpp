@@ -9,6 +9,10 @@ class MainGraphicsView : public QGraphicsView
 
   public:
     MainGraphicsView(QWidget *parent = nullptr);
+
+  protected:
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 };
 
 #endif // MAIN_GRAPHICS_VIEW_HPP
