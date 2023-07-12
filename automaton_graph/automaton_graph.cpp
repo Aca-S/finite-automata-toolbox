@@ -39,6 +39,9 @@ AutomatonGraph::AutomatonGraph(const FiniteAutomaton &automaton) : Graph(), m_au
     }
 
     compose_layout();
+
+    setFlag(QGraphicsItem::ItemIsSelectable);
+    setFlag(QGraphicsItem::ItemIsMovable);
 }
 
 QRectF AutomatonGraph::boundingRect() const { return Graph::boundingRect(); }
@@ -47,4 +50,6 @@ void AutomatonGraph::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 {
     painter->setRenderHint(QPainter::Antialiasing);
     Graph::paint(painter, option, widget);
+    if (isSelected())
+        painter->drawRect(boundingRect());
 }
