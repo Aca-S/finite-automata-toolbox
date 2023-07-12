@@ -16,6 +16,7 @@ qt_add_executable(
     main.cpp
     main_window.cpp
     main_window.ui
+    main_graphics_view.cpp
 )
 
 target_link_libraries(
@@ -35,6 +36,7 @@ set_target_properties(
 target_include_directories(
     fat PUBLIC
     "${PROJECT_BINARY_DIR}"
+    "${PROJECT_SOURCE_DIR}"
     "${PROJECT_SOURCE_DIR}/finite_automaton"
     "${PROJECT_SOURCE_DIR}/qt_graph"
     "${PROJECT_SOURCE_DIR}/automaton_graph"

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>672</height>
+    <height>718</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <layout class="QGridLayout" name="main_view_layout">
       <item row="0" column="0">
-       <widget class="QGraphicsView" name="main_view"/>
+       <widget class="MainGraphicsView" name="main_view"/>
       </item>
      </layout>
     </item>
@@ -300,6 +300,13 @@
    </widget>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MainGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>main_graphics_view.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
