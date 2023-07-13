@@ -13,6 +13,8 @@ class AutomatonGraph : public Graph
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    const FiniteAutomaton &get_automaton() const;
+
   private:
     FiniteAutomaton m_automaton;
 };

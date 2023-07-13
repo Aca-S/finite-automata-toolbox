@@ -22,6 +22,8 @@ class MainWindow : public QMainWindow
     void construct_by_element();
     void construct_by_regex();
 
+    void setup_operations_dock();
+
     Ui::MainWindow *ui;
 };
 

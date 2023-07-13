@@ -53,3 +53,5 @@ void AutomatonGraph::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     if (isSelected())
         painter->drawRect(boundingRect());
 }
+
+const FiniteAutomaton &AutomatonGraph::get_automaton() const { return m_automaton; }

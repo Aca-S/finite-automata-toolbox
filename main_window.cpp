@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->main_view->setScene(scene);
 
     setup_construction_dock();
+    setup_operations_dock();
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -149,4 +150,24 @@ void MainWindow::construct_by_regex()
         ui->main_view->scene()->addItem(graph);
     } else
         ui->construction_by_regex_info->setText(QString::fromUtf8(automaton.error().c_str()));
+}
+
+namespace {
+void execute_unary_operation(QGraphicsScene *scene, const auto &operation)
+{
+    for (auto *selected : scene->selectedItems()) {
+        auto graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
+        if (graph) {
+            scene->addItem(new AutomatonGraph((graph->get_automaton().*operation)()));
+            scene->removeItem(graph);
+        }
+    }
+}
+} // namespace
+
+void MainWindow::setup_operations_dock()
+{
+    connect(ui->determinize_btn, &QPushButton::clicked, this, [=]() {
+        execute_unary_operation(ui->main_view->scene(), &FiniteAutomaton::determinize);
+    });
 }
