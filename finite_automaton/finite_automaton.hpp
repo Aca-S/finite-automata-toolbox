@@ -40,6 +40,7 @@ class FiniteAutomaton
         const std::map<std::pair<unsigned, char>, std::set<unsigned>> &transition_function);
 
     std::set<unsigned> epsilon_closure(const std::set<unsigned> &from_states) const;
+    FiniteAutomaton product_operation(const FiniteAutomaton &other, const auto &operation) const;
 
     std::set<char> m_alphabet;
     std::set<unsigned> m_states;

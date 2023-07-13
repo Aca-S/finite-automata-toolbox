@@ -320,3 +320,54 @@ std::set<unsigned> FiniteAutomaton::epsilon_closure(const std::set<unsigned> &fr
 
     return closure;
 }
+
+FiniteAutomaton FiniteAutomaton::product_operation(const FiniteAutomaton &other, const auto &operation) const
+{
+    std::set<char> alphabet_union;
+    std::ranges::set_union(m_alphabet, other.m_alphabet, std::inserter(alphabet_union, alphabet_union.end()));
+
+    const auto automaton_a =
+        FiniteAutomaton(alphabet_union, m_states, m_initial_states, m_final_states, m_transition_function)
+            .determinize()
+            .complete();
+    const auto automaton_b =
+        FiniteAutomaton(
+            alphabet_union, other.m_states, other.m_initial_states, other.m_final_states, other.m_transition_function)
+            .determinize()
+            .complete();
+
+    // In order to avoid an explosion of state number sizes,
+    // we will map automaton states so they form a continuous
+    // sequence starting with 0.
+    std::map<unsigned, unsigned> state_map_a, state_map_b;
+    for (const auto &state : automaton_a.m_states)
+        state_map_a.insert({state, state_map_a.size()});
+    for (const auto &state : automaton_b.m_states)
+        state_map_b.insert({state, state_map_b.size()});
+    const unsigned max_state_b = state_map_b.size();
+
+    std::set<unsigned> product_states, product_initial_states, product_final_states;
+    std::map<std::pair<unsigned, char>, std::set<unsigned>> product_transition_function;
+
+    for (const auto &state_a : automaton_a.m_states) {
+        for (const auto &state_b : automaton_b.m_states) {
+            const unsigned from_state = max_state_b * state_map_a[state_a] + state_map_b[state_b];
+
+            product_states.insert(from_state);
+            if (automaton_a.m_initial_states.contains(state_a) && automaton_b.m_initial_states.contains(state_b))
+                product_initial_states.insert(from_state);
+            if (operation(automaton_a.m_final_states.contains(state_a), automaton_b.m_final_states.contains(state_b)))
+                product_final_states.insert(from_state);
+
+            for (const auto &symbol : alphabet_union) {
+                const auto state_a_to = *automaton_a.m_transition_function.find({state_a, symbol})->second.begin();
+                const auto state_b_to = *automaton_b.m_transition_function.find({state_b, symbol})->second.begin();
+                const unsigned to_state = max_state_b * state_map_a[state_a_to] + state_map_b[state_b_to];
+                product_transition_function[{from_state, symbol}].insert(to_state);
+            }
+        }
+    }
+
+    return FiniteAutomaton(
+        alphabet_union, product_states, product_initial_states, product_final_states, product_transition_function);
+}
