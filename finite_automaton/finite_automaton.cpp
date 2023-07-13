@@ -272,6 +272,21 @@ FiniteAutomaton FiniteAutomaton::complement() const
         complete_dfa.m_transition_function);
 }
 
+FiniteAutomaton FiniteAutomaton::union_with(const FiniteAutomaton &other) const
+{
+    return product_operation(other, [](bool a, bool b) { return a || b; });
+}
+
+FiniteAutomaton FiniteAutomaton::intersection_with(const FiniteAutomaton &other) const
+{
+    return product_operation(other, [](bool a, bool b) { return a && b; });
+}
+
+FiniteAutomaton FiniteAutomaton::difference_with(const FiniteAutomaton &other) const
+{
+    return product_operation(other, [](bool a, bool b) { return a && !b; });
+}
+
 const std::set<char> &FiniteAutomaton::get_alphabet() const { return m_alphabet; }
 
 const std::set<unsigned> &FiniteAutomaton::get_states() const { return m_states; }

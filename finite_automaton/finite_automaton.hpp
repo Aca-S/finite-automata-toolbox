@@ -27,6 +27,10 @@ class FiniteAutomaton
     FiniteAutomaton minimize() const;
     FiniteAutomaton complement() const;
 
+    FiniteAutomaton union_with(const FiniteAutomaton &other) const;
+    FiniteAutomaton intersection_with(const FiniteAutomaton &other) const;
+    FiniteAutomaton difference_with(const FiniteAutomaton &other) const;
+
     const std::set<char> &get_alphabet() const;
     const std::set<unsigned> &get_states() const;
     const std::set<unsigned> &get_initial_states() const;
