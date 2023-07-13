@@ -299,6 +299,144 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QDockWidget" name="operations_dock">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="operations_dock_contents">
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <layout class="QVBoxLayout" name="operations_dock_layout">
+       <item>
+        <widget class="QGroupBox" name="unary_operations_gb">
+         <property name="title">
+          <string>Unary</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_9">
+          <item>
+           <layout class="QVBoxLayout" name="unary_operations_layout">
+            <item>
+             <widget class="QPushButton" name="determinize_btn">
+              <property name="text">
+               <string>Determinize</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="minimize_btn">
+              <property name="text">
+               <string>Minimize</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="complete_btn">
+              <property name="text">
+               <string>Complete</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="reverse_btn">
+              <property name="text">
+               <string>Reverse</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="complement_btn">
+              <property name="text">
+               <string>Complement</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="binary_operations_gb">
+         <property name="title">
+          <string>Binary</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <item>
+           <layout class="QVBoxLayout" name="binary_operations_layout">
+            <item>
+             <widget class="QPushButton" name="union_btn">
+              <property name="text">
+               <string>Union</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="intersection_btn">
+              <property name="text">
+               <string>Intersection</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="difference_btn">
+              <property name="text">
+               <string>Difference</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="general_operations_gb">
+         <property name="title">
+          <string>General</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_11">
+          <item>
+           <layout class="QVBoxLayout" name="general_operations_layout">
+            <item>
+             <widget class="QPushButton" name="clone_btn">
+              <property name="text">
+               <string>Clone</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="delete_btn">
+              <property name="text">
+               <string>Delete</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
