@@ -351,22 +351,16 @@ FiniteAutomaton FiniteAutomaton::product_operation(const FiniteAutomaton &other,
             .determinize()
             .complete();
 
-    // In order to avoid an explosion of state number sizes,
-    // we will map automaton states so they form a continuous
-    // sequence starting with 0.
-    std::map<unsigned, unsigned> state_map_a, state_map_b;
-    for (const auto &state : automaton_a.m_states)
-        state_map_a.insert({state, state_map_a.size()});
-    for (const auto &state : automaton_b.m_states)
-        state_map_b.insert({state, state_map_b.size()});
-    const unsigned max_state_b = state_map_b.size();
+    // Note: In order for the product numbering to work, the states of each automaton must form a continuous
+    // sequence. Luckily, that is already guaranteed with the FiniteAutomaton::determinize() method.
+    const unsigned num_of_states_b = automaton_b.m_states.size();
 
     std::set<unsigned> product_states, product_initial_states, product_final_states;
     std::map<std::pair<unsigned, char>, std::set<unsigned>> product_transition_function;
 
     for (const auto &state_a : automaton_a.m_states) {
         for (const auto &state_b : automaton_b.m_states) {
-            const unsigned from_state = max_state_b * state_map_a[state_a] + state_map_b[state_b];
+            const unsigned from_state = num_of_states_b * state_a + state_b;
 
             product_states.insert(from_state);
             if (automaton_a.m_initial_states.contains(state_a) && automaton_b.m_initial_states.contains(state_b))
@@ -377,7 +371,7 @@ FiniteAutomaton FiniteAutomaton::product_operation(const FiniteAutomaton &other,
             for (const auto &symbol : alphabet_union) {
                 const auto state_a_to = *automaton_a.m_transition_function.find({state_a, symbol})->second.begin();
                 const auto state_b_to = *automaton_b.m_transition_function.find({state_b, symbol})->second.begin();
-                const unsigned to_state = max_state_b * state_map_a[state_a_to] + state_map_b[state_b_to];
+                const unsigned to_state = num_of_states_b * state_a_to + state_b_to;
                 product_transition_function[{from_state, symbol}].insert(to_state);
             }
         }
