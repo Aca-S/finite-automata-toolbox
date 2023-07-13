@@ -262,12 +262,12 @@ FiniteAutomaton FiniteAutomaton::complement() const
 
     std::set<unsigned> complement_final_states;
     std::ranges::set_difference(
-        complete_dfa.get_states(), complete_dfa.get_final_states(),
+        complete_dfa.m_states, complete_dfa.m_final_states,
         std::inserter(complement_final_states, complement_final_states.end()));
 
     return FiniteAutomaton(
-        m_alphabet, complete_dfa.get_states(), complete_dfa.get_initial_states(), complement_final_states,
-        complete_dfa.get_transition_function());
+        m_alphabet, complete_dfa.m_states, complete_dfa.m_initial_states, complement_final_states,
+        complete_dfa.m_transition_function);
 }
 
 const std::set<char> &FiniteAutomaton::get_alphabet() const { return m_alphabet; }
