@@ -25,6 +25,7 @@ class FiniteAutomaton
     FiniteAutomaton complete() const;
     FiniteAutomaton reverse() const;
     FiniteAutomaton minimize() const;
+    FiniteAutomaton complement() const;
 
     const std::set<char> &get_alphabet() const;
     const std::set<unsigned> &get_states() const;

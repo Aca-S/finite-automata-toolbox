@@ -256,6 +256,20 @@ FiniteAutomaton FiniteAutomaton::minimize() const
     return reverse().determinize().reverse().determinize();
 }
 
+FiniteAutomaton FiniteAutomaton::complement() const
+{
+    const auto complete_dfa = determinize().complete();
+
+    std::set<unsigned> complement_final_states;
+    std::ranges::set_difference(
+        complete_dfa.get_states(), complete_dfa.get_final_states(),
+        std::inserter(complement_final_states, complement_final_states.end()));
+
+    return FiniteAutomaton(
+        m_alphabet, complete_dfa.get_states(), complete_dfa.get_initial_states(), complement_final_states,
+        complete_dfa.get_transition_function());
+}
+
 const std::set<char> &FiniteAutomaton::get_alphabet() const { return m_alphabet; }
 
 const std::set<unsigned> &FiniteAutomaton::get_states() const { return m_states; }
