@@ -170,4 +170,20 @@ void MainWindow::setup_operations_dock()
     connect(ui->determinize_btn, &QPushButton::clicked, this, [=]() {
         execute_unary_operation(ui->main_view->scene(), &FiniteAutomaton::determinize);
     });
+
+    connect(ui->minimize_btn, &QPushButton::clicked, this, [=]() {
+        execute_unary_operation(ui->main_view->scene(), &FiniteAutomaton::minimize);
+    });
+
+    connect(ui->complete_btn, &QPushButton::clicked, this, [=]() {
+        execute_unary_operation(ui->main_view->scene(), &FiniteAutomaton::complete);
+    });
+
+    connect(ui->reverse_btn, &QPushButton::clicked, this, [=]() {
+        execute_unary_operation(ui->main_view->scene(), &FiniteAutomaton::reverse);
+    });
+
+    connect(ui->complement_btn, &QPushButton::clicked, this, [=]() {
+        execute_unary_operation(ui->main_view->scene(), &FiniteAutomaton::complement);
+    });
 }
