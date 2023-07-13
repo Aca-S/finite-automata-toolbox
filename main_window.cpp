@@ -163,6 +163,28 @@ void execute_unary_operation(QGraphicsScene *scene, const auto &operation)
         }
     }
 }
+
+void execute_binary_operation(QGraphicsScene *scene, const auto &operation)
+{
+    using namespace std::views;
+
+    auto graphs = scene->selectedItems()
+                  | transform([](auto *item) { return qgraphicsitem_cast<AutomatonGraph *>(item); })
+                  | filter([](auto *graph) { return graph != nullptr; });
+
+    // TODO: Can be replaced with one call to std::ranges::fold_left_first
+    // once it's more widely supported.
+    if (std::ranges::distance(graphs.begin(), graphs.end()) > 1) {
+        auto it = graphs.begin();
+        auto acc = (*it)->get_automaton();
+        scene->removeItem(*it);
+        for (std::advance(it, 1); it != graphs.end(); ++it) {
+            acc = (acc.*operation)((*it)->get_automaton());
+            scene->removeItem(*it);
+        }
+        scene->addItem(new AutomatonGraph(acc));
+    }
+}
 } // namespace
 
 void MainWindow::setup_operations_dock()
@@ -185,5 +207,17 @@ void MainWindow::setup_operations_dock()
 
     connect(ui->complement_btn, &QPushButton::clicked, this, [=]() {
         execute_unary_operation(ui->main_view->scene(), &FiniteAutomaton::complement);
+    });
+
+    connect(ui->union_btn, &QPushButton::clicked, this, [=]() {
+        execute_binary_operation(ui->main_view->scene(), &FiniteAutomaton::union_with);
+    });
+
+    connect(ui->intersection_btn, &QPushButton::clicked, this, [=]() {
+        execute_binary_operation(ui->main_view->scene(), &FiniteAutomaton::intersection_with);
+    });
+
+    connect(ui->difference_btn, &QPushButton::clicked, this, [=]() {
+        execute_binary_operation(ui->main_view->scene(), &FiniteAutomaton::difference_with);
     });
 }
