@@ -214,10 +214,12 @@ FiniteAutomaton FiniteAutomaton::determinize() const
 
 FiniteAutomaton FiniteAutomaton::complete() const
 {
-    std::map<std::pair<unsigned, char>, std::set<unsigned>> complete_transition_function = m_transition_function;
-    std::set<unsigned> complete_states = m_states;
+    auto complete_transition_function = m_transition_function;
+    auto complete_states = m_states;
 
-    const auto error_state = m_states.size();
+    // More efficient to just grab the last element since std::set is sorted,
+    // but we're leaving it like this for a more seamless potential container type switch.
+    const auto error_state = *std::ranges::max_element(m_states) + 1;
     bool error_state_added = false;
 
     for (const auto &state : m_states) {
