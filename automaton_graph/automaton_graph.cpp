@@ -42,6 +42,7 @@ AutomatonGraph::AutomatonGraph(const FiniteAutomaton &automaton) : Graph(), m_au
 
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(QGraphicsItem::ItemIsMovable);
+    setFlag(QGraphicsItem::ItemSendsGeometryChanges);
 }
 
 QRectF AutomatonGraph::boundingRect() const { return Graph::boundingRect(); }

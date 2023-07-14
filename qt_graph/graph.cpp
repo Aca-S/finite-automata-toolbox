@@ -79,4 +79,10 @@ void Graph::compose_layout()
         e->update_positions();
         m_bounding_rectangle |= e->boundingRect();
     }
+
+    // Translate all child items so that the origin point matches
+    // the top left corner of the graph's bounding rectangle.
+    m_bounding_rectangle.moveBottom(m_bounding_rectangle.bottom() + m_bounding_rectangle.height());
+    for (auto *item : childItems())
+        item->setPos({item->x(), item->y() + m_bounding_rectangle.height()});
 }

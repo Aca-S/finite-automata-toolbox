@@ -23,6 +23,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow() { delete ui; }
 
 namespace {
+QPointF get_center_pos(QGraphicsItem *item)
+{
+    auto br = item->boundingRect();
+    return item->pos() + QPointF(br.width(), br.height()) / 2.0;
+}
+
+QPointF get_viewport_center_pos(QGraphicsView *view) { return view->mapToScene(view->rect().center()); }
+
+void add_item_at_pos(QGraphicsItem *item, QGraphicsScene *scene, const QPointF &center_pos)
+{
+    auto br = item->boundingRect();
+    item->setPos(center_pos - QPointF(br.width(), br.height()) / 2.0);
+    scene->addItem(item);
+}
+} // namespace
+
+namespace {
 // Sets a line edit validator and optionally an info label which will display
 // a specified message on invalid inputs or when focus has left the line edit
 // while it contains a non-acceptable text.
@@ -136,7 +153,7 @@ void MainWindow::construct_by_element()
     auto automaton = FiniteAutomaton::construct(alphabet, states, initial_states, final_states, transition_function);
     if (automaton) {
         auto graph = new AutomatonGraph(*automaton);
-        ui->main_view->scene()->addItem(graph);
+        add_item_at_pos(graph, ui->main_view->scene(), get_viewport_center_pos(ui->main_view));
     } else
         ui->construction_by_element_info->setText(QString::fromUtf8(automaton.error().c_str()));
 }
@@ -147,28 +164,29 @@ void MainWindow::construct_by_regex()
     auto automaton = FiniteAutomaton::construct(regex);
     if (automaton) {
         auto graph = new AutomatonGraph(*automaton);
-        ui->main_view->scene()->addItem(graph);
+        add_item_at_pos(graph, ui->main_view->scene(), get_viewport_center_pos(ui->main_view));
     } else
         ui->construction_by_regex_info->setText(QString::fromUtf8(automaton.error().c_str()));
 }
 
 namespace {
-void execute_unary_operation(QGraphicsScene *scene, const auto &operation)
+void execute_unary_operation(QGraphicsView *view, const auto &operation)
 {
-    for (auto *selected : scene->selectedItems()) {
+    for (auto *selected : view->scene()->selectedItems()) {
         auto graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
         if (graph) {
-            scene->addItem(new AutomatonGraph((graph->get_automaton().*operation)()));
-            scene->removeItem(graph);
+            add_item_at_pos(
+                new AutomatonGraph((graph->get_automaton().*operation)()), view->scene(), get_center_pos(graph));
+            view->scene()->removeItem(graph);
         }
     }
 }
 
-void execute_binary_operation(QGraphicsScene *scene, const auto &operation)
+void execute_binary_operation(QGraphicsView *view, const auto &operation)
 {
     using namespace std::views;
 
-    auto graphs = scene->selectedItems()
+    auto graphs = view->scene()->selectedItems()
                   | transform([](auto *item) { return qgraphicsitem_cast<AutomatonGraph *>(item); })
                   | filter([](auto *graph) { return graph != nullptr; });
 
@@ -177,30 +195,31 @@ void execute_binary_operation(QGraphicsScene *scene, const auto &operation)
     if (std::ranges::distance(graphs.begin(), graphs.end()) > 1) {
         auto it = graphs.begin();
         auto acc = (*it)->get_automaton();
-        scene->removeItem(*it);
+        view->scene()->removeItem(*it);
         for (std::advance(it, 1); it != graphs.end(); ++it) {
             acc = (acc.*operation)((*it)->get_automaton());
-            scene->removeItem(*it);
+            view->scene()->removeItem(*it);
         }
-        scene->addItem(new AutomatonGraph(acc));
+        add_item_at_pos(new AutomatonGraph(acc), view->scene(), get_viewport_center_pos(view));
     }
 }
 
-void execute_clone(QGraphicsScene *scene)
+void execute_clone(QGraphicsView *view)
 {
-    for (auto *selected : scene->selectedItems()) {
+    for (auto *selected : view->scene()->selectedItems()) {
         auto graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
         if (graph)
-            scene->addItem(new AutomatonGraph((graph->get_automaton())));
+            add_item_at_pos(
+                new AutomatonGraph((graph->get_automaton())), view->scene(), get_center_pos(graph) + QPointF(20, 20));
     }
 }
 
-void execute_delete(QGraphicsScene *scene)
+void execute_delete(QGraphicsView *view)
 {
-    for (auto *selected : scene->selectedItems()) {
+    for (auto *selected : view->scene()->selectedItems()) {
         auto graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
         if (graph)
-            scene->removeItem(graph);
+            view->scene()->removeItem(graph);
     }
 }
 } // namespace
@@ -208,38 +227,38 @@ void execute_delete(QGraphicsScene *scene)
 void MainWindow::setup_operations_dock()
 {
     connect(ui->determinize_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(ui->main_view->scene(), &FiniteAutomaton::determinize);
+        execute_unary_operation(ui->main_view, &FiniteAutomaton::determinize);
     });
 
     connect(ui->minimize_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(ui->main_view->scene(), &FiniteAutomaton::minimize);
+        execute_unary_operation(ui->main_view, &FiniteAutomaton::minimize);
     });
 
     connect(ui->complete_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(ui->main_view->scene(), &FiniteAutomaton::complete);
+        execute_unary_operation(ui->main_view, &FiniteAutomaton::complete);
     });
 
     connect(ui->reverse_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(ui->main_view->scene(), &FiniteAutomaton::reverse);
+        execute_unary_operation(ui->main_view, &FiniteAutomaton::reverse);
     });
 
     connect(ui->complement_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(ui->main_view->scene(), &FiniteAutomaton::complement);
+        execute_unary_operation(ui->main_view, &FiniteAutomaton::complement);
     });
 
     connect(ui->union_btn, &QPushButton::clicked, this, [=]() {
-        execute_binary_operation(ui->main_view->scene(), &FiniteAutomaton::union_with);
+        execute_binary_operation(ui->main_view, &FiniteAutomaton::union_with);
     });
 
     connect(ui->intersection_btn, &QPushButton::clicked, this, [=]() {
-        execute_binary_operation(ui->main_view->scene(), &FiniteAutomaton::intersection_with);
+        execute_binary_operation(ui->main_view, &FiniteAutomaton::intersection_with);
     });
 
     connect(ui->difference_btn, &QPushButton::clicked, this, [=]() {
-        execute_binary_operation(ui->main_view->scene(), &FiniteAutomaton::difference_with);
+        execute_binary_operation(ui->main_view, &FiniteAutomaton::difference_with);
     });
 
-    connect(ui->clone_btn, &QPushButton::clicked, this, [=]() { execute_clone(ui->main_view->scene()); });
+    connect(ui->clone_btn, &QPushButton::clicked, this, [=]() { execute_clone(ui->main_view); });
 
-    connect(ui->delete_btn, &QPushButton::clicked, this, [=]() { execute_delete(ui->main_view->scene()); });
+    connect(ui->delete_btn, &QPushButton::clicked, this, [=]() { execute_delete(ui->main_view); });
 }
