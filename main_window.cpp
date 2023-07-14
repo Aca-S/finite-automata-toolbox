@@ -96,18 +96,19 @@ void MainWindow::setup_construction_dock()
         ui->regex_construction_le, regex_validator, ui->construction_by_regex_info,
         "Only printable ASCII symbols are allowed in the RegEx.");
 
-    connect(ui->transition_btn, &QPushButton::clicked, ui->transition_list, [=]() {
+    connect(ui->add_transition_btn, &QPushButton::clicked, ui->transition_list, [=]() {
         if (ui->transition_le->hasAcceptableInput())
             ui->transition_list->addItem(ui->transition_le->text());
     });
 
-    connect(ui->construction_by_element_btn, &QPushButton::clicked, this, [=]() {
-        construct_by_element();
+    connect(ui->remove_transition_btn, &QPushButton::clicked, ui->transition_list, [=]() {
+        for (auto *transition : ui->transition_list->selectedItems())
+            delete ui->transition_list->takeItem(ui->transition_list->row(transition));
     });
 
-    connect(ui->construction_by_regex_btn, &QPushButton::clicked, this, [=]() {
-        construct_by_regex();
-    });
+    connect(ui->construction_by_element_btn, &QPushButton::clicked, this, [=]() { construct_by_element(); });
+
+    connect(ui->construction_by_regex_btn, &QPushButton::clicked, this, [=]() { construct_by_regex(); });
 }
 
 void MainWindow::construct_by_element()

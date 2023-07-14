@@ -196,7 +196,11 @@
              </widget>
             </item>
             <item row="0" column="1" rowspan="3">
-             <widget class="QListWidget" name="transition_list"/>
+             <widget class="QListWidget" name="transition_list">
+              <property name="selectionMode">
+               <enum>QAbstractItemView::MultiSelection</enum>
+              </property>
+             </widget>
             </item>
             <item row="3" column="1">
              <layout class="QHBoxLayout" name="transition_layout">
@@ -208,9 +212,16 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="transition_btn">
+               <widget class="QPushButton" name="add_transition_btn">
                 <property name="text">
-                 <string>Add transition</string>
+                 <string>Add</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="remove_transition_btn">
+                <property name="text">
+                 <string>Remove</string>
                 </property>
                </widget>
               </item>
