@@ -173,10 +173,11 @@ namespace {
 void execute_unary_operation(QGraphicsView *view, const auto &operation)
 {
     for (auto *selected : view->scene()->selectedItems()) {
-        auto graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
+        auto *graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
         if (graph) {
-            add_item_at_pos(
-                new AutomatonGraph((graph->get_automaton().*operation)()), view->scene(), get_center_pos(graph));
+            auto *new_graph = new AutomatonGraph((graph->get_automaton().*operation)());
+            add_item_at_pos(new_graph, view->scene(), get_center_pos(graph));
+            new_graph->setSelected(true);
             view->scene()->removeItem(graph);
         }
     }
@@ -200,24 +201,29 @@ void execute_binary_operation(QGraphicsView *view, const auto &operation)
             acc = (acc.*operation)((*it)->get_automaton());
             view->scene()->removeItem(*it);
         }
-        add_item_at_pos(new AutomatonGraph(acc), view->scene(), get_viewport_center_pos(view));
+        auto *new_graph = new AutomatonGraph(acc);
+        add_item_at_pos(new_graph, view->scene(), get_viewport_center_pos(view));
+        new_graph->setSelected(true);
     }
 }
 
 void execute_clone(QGraphicsView *view)
 {
     for (auto *selected : view->scene()->selectedItems()) {
-        auto graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
-        if (graph)
-            add_item_at_pos(
-                new AutomatonGraph((graph->get_automaton())), view->scene(), get_center_pos(graph) + QPointF(20, 20));
+        auto *graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
+        if (graph) {
+            auto *new_graph = new AutomatonGraph((graph->get_automaton()));
+            add_item_at_pos(new_graph, view->scene(), get_center_pos(graph) + QPointF(20, 20));
+            graph->setSelected(false);
+            new_graph->setSelected(true);
+        }
     }
 }
 
 void execute_delete(QGraphicsView *view)
 {
     for (auto *selected : view->scene()->selectedItems()) {
-        auto graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
+        auto *graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
         if (graph)
             view->scene()->removeItem(graph);
     }
