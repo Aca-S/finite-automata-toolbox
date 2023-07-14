@@ -185,6 +185,24 @@ void execute_binary_operation(QGraphicsScene *scene, const auto &operation)
         scene->addItem(new AutomatonGraph(acc));
     }
 }
+
+void execute_clone(QGraphicsScene *scene)
+{
+    for (auto *selected : scene->selectedItems()) {
+        auto graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
+        if (graph)
+            scene->addItem(new AutomatonGraph((graph->get_automaton())));
+    }
+}
+
+void execute_delete(QGraphicsScene *scene)
+{
+    for (auto *selected : scene->selectedItems()) {
+        auto graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
+        if (graph)
+            scene->removeItem(graph);
+    }
+}
 } // namespace
 
 void MainWindow::setup_operations_dock()
@@ -220,4 +238,8 @@ void MainWindow::setup_operations_dock()
     connect(ui->difference_btn, &QPushButton::clicked, this, [=]() {
         execute_binary_operation(ui->main_view->scene(), &FiniteAutomaton::difference_with);
     });
+
+    connect(ui->clone_btn, &QPushButton::clicked, this, [=]() { execute_clone(ui->main_view->scene()); });
+
+    connect(ui->delete_btn, &QPushButton::clicked, this, [=]() { execute_delete(ui->main_view->scene()); });
 }
