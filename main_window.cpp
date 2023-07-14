@@ -101,11 +101,12 @@ void MainWindow::setup_construction_dock()
             ui->transition_list->addItem(ui->transition_le->text());
     });
 
-    connect(ui->construct_btn, &QPushButton::clicked, this, [=]() {
-        if (ui->by_element_rb->isChecked())
-            construct_by_element();
-        else if (ui->by_regex_rb->isChecked())
-            construct_by_regex();
+    connect(ui->construction_by_element_btn, &QPushButton::clicked, this, [=]() {
+        construct_by_element();
+    });
+
+    connect(ui->construction_by_regex_btn, &QPushButton::clicked, this, [=]() {
+        construct_by_regex();
     });
 }
 
