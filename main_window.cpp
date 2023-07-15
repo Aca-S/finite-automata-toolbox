@@ -67,10 +67,12 @@ void MainWindow::setup_construction_dock()
     QString unsigned_regex = "(0|[1-9]\\d*)";
 
     QRegularExpression sym_list_regex("^(" + symbol_regex + "( " + symbol_regex + ")*)?$");
+    QRegularExpression num_list_not_empty_regex("^(" + unsigned_regex + "( " + unsigned_regex + ")*)$");
     QRegularExpression num_list_regex("^(" + unsigned_regex + "( " + unsigned_regex + ")*)?$");
     QRegularExpression transition_regex("^" + unsigned_regex + " " + symbol_regex + " " + unsigned_regex + "$");
 
     auto alphabet_validator = new QRegularExpressionValidator(sym_list_regex, this);
+    auto states_not_empty_validator = new QRegularExpressionValidator(num_list_not_empty_regex, this);
     auto states_validator = new QRegularExpressionValidator(num_list_regex, this);
     auto transition_validator = new QRegularExpressionValidator(transition_regex, this);
 
@@ -78,8 +80,8 @@ void MainWindow::setup_construction_dock()
         ui->alphabet_le, alphabet_validator, ui->construction_by_element_info,
         "The alphabet input must be a space separated list of printable ASCII characters.");
     set_validator(
-        ui->states_le, states_validator, ui->construction_by_element_info,
-        "The states input must be a space separated list of numbers.");
+        ui->states_le, states_not_empty_validator, ui->construction_by_element_info,
+        "The states input must be a non-empty space separated list of numbers.");
     set_validator(
         ui->initial_states_le, states_validator, ui->construction_by_element_info,
         "The initial states input must be a space separated list of numbers.");
