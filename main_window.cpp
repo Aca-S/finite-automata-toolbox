@@ -99,13 +99,17 @@ void MainWindow::setup_construction_dock()
         "Only printable ASCII symbols are allowed in the RegEx.");
 
     connect(ui->add_transition_btn, &QPushButton::clicked, ui->transition_list, [=]() {
-        if (ui->transition_le->hasAcceptableInput())
+        if (ui->transition_le->hasAcceptableInput()) {
             ui->transition_list->addItem(ui->transition_le->text());
+            ui->transition_le->clear();
+        }
+        ui->transition_le->setFocus();
     });
 
     connect(ui->remove_transition_btn, &QPushButton::clicked, ui->transition_list, [=]() {
         for (auto *transition : ui->transition_list->selectedItems())
             delete ui->transition_list->takeItem(ui->transition_list->row(transition));
+        ui->transition_le->setFocus();
     });
 
     connect(ui->construction_by_element_btn, &QPushButton::clicked, this, [=]() { construct_by_element(); });
