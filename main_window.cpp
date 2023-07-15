@@ -63,7 +63,7 @@ void set_validator(
 
 void MainWindow::setup_construction_dock()
 {
-    QString symbol_regex = "[ -~]"; // Printable ASCII characters.
+    QString symbol_regex = "[!-~]"; // Printable ASCII characters without space.
     QString unsigned_regex = "(0|[1-9]\\d*)";
 
     QRegularExpression sym_list_regex("^(" + symbol_regex + "( " + symbol_regex + ")*)?$");
