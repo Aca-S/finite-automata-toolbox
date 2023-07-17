@@ -280,6 +280,39 @@ FiniteAutomaton FiniteAutomaton::difference_with(const FiniteAutomaton &other) c
     return product_operation(other, [](bool a, bool b) { return a && !b; });
 }
 
+namespace {
+
+std::string ast_to_string(const RegexAST &ast)
+{
+    return std::visit(
+        overloaded{
+            [](const ConcatenationAST &node) {
+                auto left = ast_to_string(node.get_left());
+                auto right = ast_to_string(node.get_right());
+                return "(" + left + ")" + "(" + right + ")";
+            },
+            [](const AlternationAST &node) {
+                auto left = ast_to_string(node.get_left());
+                auto right = ast_to_string(node.get_right());
+                return "(" + left + ")" + "(" + right + ")";
+            },
+            [](const ZeroOrOneAST &node) {
+                auto operand = ast_to_string(node.get_operand());
+                return "(" + operand + ")?";
+            },
+            [](const ZeroOrMoreAST &node) {
+                auto operand = ast_to_string(node.get_operand());
+                return "(" + operand + ")*";
+            },
+            [](const OneOrMoreAST &node) {
+                auto operand = ast_to_string(node.get_operand());
+                return "(" + operand + ")+";
+            },
+            [](const SymbolAST &node) { return std::string(1, node.get_symbol()); }},
+        ast);
+}
+} // namespace
+
 const std::set<char> &FiniteAutomaton::get_alphabet() const { return m_alphabet; }
 
 const std::set<unsigned> &FiniteAutomaton::get_states() const { return m_states; }
