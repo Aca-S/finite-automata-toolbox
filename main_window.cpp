@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     setup_construction_dock();
     setup_operations_dock();
+    setup_view_dock();
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -178,30 +179,32 @@ void MainWindow::construct_by_regex()
 }
 
 namespace {
+template <typename T> QList<T *> get_selected(QGraphicsScene *scene)
+{
+    using namespace std::views;
+
+    auto selected = scene->selectedItems() | transform([](auto *item) { return qgraphicsitem_cast<T *>(item); })
+                    | filter([](auto *item) { return item != nullptr; });
+    return QList<T *>(selected.begin(), selected.end());
+}
+
 void execute_unary_operation(QGraphicsView *view, const auto &operation)
 {
-    for (auto *selected : view->scene()->selectedItems()) {
-        auto *graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
-        if (graph) {
-            auto *new_graph = new AutomatonGraph((graph->get_automaton().*operation)());
-            add_item_at_pos(new_graph, view->scene(), get_center_pos(graph));
-            new_graph->setSelected(true);
-            view->scene()->removeItem(graph);
-        }
+    for (auto *graph : get_selected<AutomatonGraph>(view->scene())) {
+        auto *new_graph = new AutomatonGraph((graph->get_automaton().*operation)());
+        add_item_at_pos(new_graph, view->scene(), get_center_pos(graph));
+        new_graph->setSelected(true);
+        view->scene()->removeItem(graph);
     }
 }
 
 void execute_binary_operation(QGraphicsView *view, const auto &operation)
 {
-    using namespace std::views;
-
-    auto graphs = view->scene()->selectedItems()
-                  | transform([](auto *item) { return qgraphicsitem_cast<AutomatonGraph *>(item); })
-                  | filter([](auto *graph) { return graph != nullptr; });
+    auto graphs = get_selected<AutomatonGraph>(view->scene());
 
     // TODO: Can be replaced with one call to std::ranges::fold_left_first
     // once it's more widely supported.
-    if (std::ranges::distance(graphs.begin(), graphs.end()) > 1) {
+    if (graphs.size() > 1) {
         auto it = graphs.begin();
         auto acc = (*it)->get_automaton();
         view->scene()->removeItem(*it);
@@ -217,24 +220,18 @@ void execute_binary_operation(QGraphicsView *view, const auto &operation)
 
 void execute_clone(QGraphicsView *view)
 {
-    for (auto *selected : view->scene()->selectedItems()) {
-        auto *graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
-        if (graph) {
-            auto *new_graph = new AutomatonGraph((graph->get_automaton()));
-            add_item_at_pos(new_graph, view->scene(), get_center_pos(graph) + QPointF(20, 20));
-            graph->setSelected(false);
-            new_graph->setSelected(true);
-        }
+    for (auto *graph : get_selected<AutomatonGraph>(view->scene())) {
+        auto *new_graph = new AutomatonGraph((graph->get_automaton()));
+        add_item_at_pos(new_graph, view->scene(), get_center_pos(graph) + QPointF(20, 20));
+        graph->setSelected(false);
+        new_graph->setSelected(true);
     }
 }
 
 void execute_delete(QGraphicsView *view)
 {
-    for (auto *selected : view->scene()->selectedItems()) {
-        auto *graph = qgraphicsitem_cast<AutomatonGraph *>(selected);
-        if (graph)
-            view->scene()->removeItem(graph);
-    }
+    for (auto *graph : get_selected<AutomatonGraph>(view->scene()))
+        view->scene()->removeItem(graph);
 }
 } // namespace
 
@@ -275,4 +272,22 @@ void MainWindow::setup_operations_dock()
     connect(ui->clone_btn, &QPushButton::clicked, this, [=]() { execute_clone(ui->main_view); });
 
     connect(ui->delete_btn, &QPushButton::clicked, this, [=]() { execute_delete(ui->main_view); });
+}
+
+void MainWindow::setup_view_dock()
+{
+    ui->select_view->setScene(new QGraphicsScene(this));
+
+    connect(ui->view_selected_btn, &QPushButton::clicked, this, [=]() {
+        ui->select_view->scene()->clear();
+
+        auto graphs = get_selected<AutomatonGraph>(ui->main_view->scene());
+
+        if (graphs.size() > 0) {
+            auto *new_graph = new AutomatonGraph(graphs.at(0)->get_automaton());
+            new_graph->setFlag(QGraphicsItem::ItemIsSelectable, false);
+            new_graph->setFlag(QGraphicsItem::ItemIsMovable, false);
+            add_item_at_pos(new_graph, ui->select_view->scene(), {0, 0});
+        }
+    });
 }

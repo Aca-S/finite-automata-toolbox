@@ -56,6 +56,20 @@
         <widget class="QGraphicsView" name="select_view"/>
        </item>
        <item>
+        <widget class="QPushButton" name="view_selected_btn">
+         <property name="text">
+          <string>View selected</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Line" name="line_0">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="generate_word_btn_layout">
          <item>
           <widget class="QPushButton" name="generate_acceptable_btn">
@@ -111,6 +125,13 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="Line" name="line_1">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="generate_regex_layout">

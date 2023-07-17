@@ -24,6 +24,8 @@ class MainWindow : public QMainWindow
 
     void setup_operations_dock();
 
+    void setup_view_dock();
+
     Ui::MainWindow *ui;
 };
 
