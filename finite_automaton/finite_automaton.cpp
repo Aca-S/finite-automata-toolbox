@@ -55,13 +55,6 @@ std::expected<FiniteAutomaton, std::string> FiniteAutomaton::construct(
 
 namespace {
 
-template <class... Ts> struct overloaded : Ts...
-{
-    using Ts::operator()...;
-};
-
-template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
-
 using tf_t = std::map<std::pair<unsigned, char>, std::set<unsigned>>;
 
 std::pair<tf_t, unsigned> compile_regex(const RegexAST &ast, unsigned start_state)

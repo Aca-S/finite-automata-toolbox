@@ -72,4 +72,12 @@ class RegexAST
     : public std::variant<ConcatenationAST, AlternationAST, ZeroOrOneAST, ZeroOrMoreAST, OneOrMoreAST, SymbolAST>
 {};
 
+// For overloaded lambdas...
+template <class... Ts> struct overloaded : Ts...
+{
+    using Ts::operator()...;
+};
+
+template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
 #endif // REGEX_AST_HPP
