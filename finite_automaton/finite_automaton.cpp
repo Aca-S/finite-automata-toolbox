@@ -282,33 +282,44 @@ FiniteAutomaton FiniteAutomaton::difference_with(const FiniteAutomaton &other) c
 
 namespace {
 
+unsigned precedence(const RegexAST &ast)
+{
+    return std::visit(
+        overloaded{
+            [](const ConcatenationAST &node) { return 1; }, [](const AlternationAST &node) { return 0; },
+            [](const ZeroOrOneAST &node) { return 2; }, [](const ZeroOrMoreAST &node) { return 2; },
+            [](const OneOrMoreAST &node) { return 2; }, [](const SymbolAST &node) { return 3; }},
+        ast);
+}
+
+std::string ast_to_string(const RegexAST &ast);
+
+std::string node_to_string(const RegexAST &node, const RegexAST &parent)
+{
+    if (precedence(node) < precedence(parent))
+        return "(" + ast_to_string(node) + ")";
+    else
+        return ast_to_string(node);
+}
+
 std::string ast_to_string(const RegexAST &ast)
 {
     return std::visit(
         overloaded{
-            [](const ConcatenationAST &node) {
-                auto left = ast_to_string(node.get_left());
-                auto right = ast_to_string(node.get_right());
-                return "(" + left + ")(" + right + ")";
+            [&ast](const ConcatenationAST &node) {
+                auto left = node_to_string(node.get_left(), ast);
+                auto right = node_to_string(node.get_right(), ast);
+                return left + right;
             },
-            [](const AlternationAST &node) {
-                auto left = ast_to_string(node.get_left());
-                auto right = ast_to_string(node.get_right());
-                return "(" + left + ")|(" + right + ")";
+            [&ast](const AlternationAST &node) {
+                auto left = node_to_string(node.get_left(), ast);
+                auto right = node_to_string(node.get_right(), ast);
+                return left + "|" + right;
             },
-            [](const ZeroOrOneAST &node) {
-                auto operand = ast_to_string(node.get_operand());
-                return "(" + operand + ")?";
-            },
-            [](const ZeroOrMoreAST &node) {
-                auto operand = ast_to_string(node.get_operand());
-                return "(" + operand + ")*";
-            },
-            [](const OneOrMoreAST &node) {
-                auto operand = ast_to_string(node.get_operand());
-                return "(" + operand + ")+";
-            },
-            [](const SymbolAST &node) {
+            [&ast](const ZeroOrOneAST &node) { return node_to_string(node.get_operand(), ast) + "?"; },
+            [&ast](const ZeroOrMoreAST &node) { return node_to_string(node.get_operand(), ast) + "*"; },
+            [&ast](const OneOrMoreAST &node) { return node_to_string(node.get_operand(), ast) + "+"; },
+            [&ast](const SymbolAST &node) {
                 if (node.get_symbol() == FiniteAutomaton::epsilon_transition_value)
                     return std::string("");
                 else
