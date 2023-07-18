@@ -329,7 +329,7 @@ std::string ast_to_string(const RegexAST &ast)
 }
 } // namespace
 
-std::string FiniteAutomaton::generate_regex() const
+std::optional<std::string> FiniteAutomaton::generate_regex() const
 {
     const auto &eps = FiniteAutomaton::epsilon_transition_value;
 
@@ -349,15 +349,15 @@ std::string FiniteAutomaton::generate_regex() const
     automaton.m_initial_states = {new_initial};
     automaton.m_final_states = {new_final};
 
-    std::map<std::pair<unsigned, unsigned>, std::unique_ptr<RegexAST>> strict_ast_map;
+    std::map<std::pair<unsigned, unsigned>, std::string> label_map;
     for (const auto &[k, v] : automaton.m_transition_function) {
         for (const auto &to_state : v) {
-            auto symbol_node = std::make_unique<RegexAST>(SymbolAST(k.second));
-            auto it = strict_ast_map.find({k.first, to_state});
-            if (it == strict_ast_map.end())
-                strict_ast_map.insert({{k.first, to_state}, std::move(symbol_node)});
+            auto symbol_node = std::string(1, k.second);
+            auto it = label_map.find({k.first, to_state});
+            if (it == label_map.end())
+                label_map.insert({{k.first, to_state}, symbol_node});
             else
-                it->second = std::make_unique<RegexAST>(AlternationAST(std::move(it->second), std::move(symbol_node)));
+                it->second = it->second + "|" + symbol_node;
         }
     }
 
@@ -369,28 +369,33 @@ std::string FiniteAutomaton::generate_regex() const
         states_copy.erase(q_state);
         for (const auto &p_state : states_copy) {
             for (const auto &r_state : states_copy) {
-                auto pq = strict_ast_map.find({p_state, q_state});
-                auto qr = strict_ast_map.find({q_state, r_state});
-                if (pq == strict_ast_map.end() || qr == strict_ast_map.end())
+                auto pq = label_map.find({p_state, q_state});
+                auto qr = label_map.find({q_state, r_state});
+                if (pq == label_map.end() || qr == label_map.end())
                     continue;
-                auto qq = strict_ast_map.find({q_state, q_state});
-                auto pr = strict_ast_map.find({p_state, r_state});
+                auto qq = label_map.find({q_state, q_state});
+                auto pr = label_map.find({p_state, r_state});
 
-                auto result = std::move(pq->second);
-                if (qq != strict_ast_map.end()) {
-                    auto loop_ast = std::make_unique<RegexAST>(ZeroOrMoreAST(std::move(qq->second)));
-                    result = std::make_unique<RegexAST>(ConcatenationAST(std::move(result), std::move(loop_ast)));
-                }
-                result = std::make_unique<RegexAST>(ConcatenationAST(std::move(result), std::move(qr->second)));
-                if (pr != strict_ast_map.end())
-                    result = std::make_unique<RegexAST>(AlternationAST(std::move(result), std::move(pr->second)));
+                auto result = "(" + pq->second + ")";
+                if (qq != label_map.end())
+                    result = result + "(" + qq->second + ")*";
+                result = result + "(" + qr->second + ")";
+                if (pr != label_map.end())
+                    result = result + "|" + "(" + pr->second + ")";
 
-                strict_ast_map[{p_state, r_state}] = std::move(result);
+                label_map[{p_state, r_state}] = result;
             }
         }
     }
 
-    return ast_to_string(*strict_ast_map[{new_initial, new_final}]);
+    // TODO: Work on getting a value based recursive variant
+    // up and running for the regex AST, which would allow for
+    // the direct creation of ASTs instead of string labels.
+    auto it = label_map.find({new_initial, new_final});
+    if (it == label_map.end())
+        return std::nullopt;
+    else
+        return ast_to_string(*RegexDriver().parse(it->second));
 }
 
 const std::set<char> &FiniteAutomaton::get_alphabet() const { return m_alphabet; }

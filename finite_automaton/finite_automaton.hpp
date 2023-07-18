@@ -3,6 +3,7 @@
 
 #include <expected>
 #include <map>
+#include <optional>
 #include <set>
 #include <string>
 #include <utility>
@@ -10,7 +11,7 @@
 class FiniteAutomaton
 {
   public:
-    inline static const char epsilon_transition_value = 0;
+    inline static const char epsilon_transition_value = '~';
 
     static std::expected<FiniteAutomaton, std::string> construct(
         const std::set<char> &alphabet, const std::set<unsigned> &states, const std::set<unsigned> &initial_states,
@@ -31,7 +32,7 @@ class FiniteAutomaton
     FiniteAutomaton intersection_with(const FiniteAutomaton &other) const;
     FiniteAutomaton difference_with(const FiniteAutomaton &other) const;
 
-    std::string generate_regex() const;
+    std::optional<std::string> generate_regex() const;
 
     const std::set<char> &get_alphabet() const;
     const std::set<unsigned> &get_states() const;
