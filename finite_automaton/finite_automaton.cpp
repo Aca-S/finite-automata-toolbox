@@ -289,12 +289,12 @@ std::string ast_to_string(const RegexAST &ast)
             [](const ConcatenationAST &node) {
                 auto left = ast_to_string(node.get_left());
                 auto right = ast_to_string(node.get_right());
-                return "(" + left + ")" + "(" + right + ")";
+                return "(" + left + ")(" + right + ")";
             },
             [](const AlternationAST &node) {
                 auto left = ast_to_string(node.get_left());
                 auto right = ast_to_string(node.get_right());
-                return "(" + left + ")" + "(" + right + ")";
+                return "(" + left + ")|(" + right + ")";
             },
             [](const ZeroOrOneAST &node) {
                 auto operand = ast_to_string(node.get_operand());
@@ -308,10 +308,79 @@ std::string ast_to_string(const RegexAST &ast)
                 auto operand = ast_to_string(node.get_operand());
                 return "(" + operand + ")+";
             },
-            [](const SymbolAST &node) { return std::string(1, node.get_symbol()); }},
+            [](const SymbolAST &node) {
+                if (node.get_symbol() == FiniteAutomaton::epsilon_transition_value)
+                    return std::string("");
+                else
+                    return std::string(1, node.get_symbol());
+            }},
         ast);
 }
 } // namespace
+
+std::string FiniteAutomaton::generate_regex() const
+{
+    const auto &eps = FiniteAutomaton::epsilon_transition_value;
+
+    // Node: Can also just be determinized instead of minimized,
+    // but this way the resulting regex will be shorter.
+    auto automaton = minimize().complete();
+
+    unsigned new_initial = automaton.m_states.size();
+    unsigned new_final = new_initial + 1;
+
+    automaton.m_states.insert({new_initial, new_final});
+
+    automaton.m_transition_function[{new_initial, eps}].insert(*automaton.m_initial_states.begin());
+    for (const auto &state : automaton.m_final_states)
+        automaton.m_transition_function[{state, eps}].insert(new_final);
+
+    automaton.m_initial_states = {new_initial};
+    automaton.m_final_states = {new_final};
+
+    std::map<std::pair<unsigned, unsigned>, std::unique_ptr<RegexAST>> strict_ast_map;
+    for (const auto &[k, v] : automaton.m_transition_function) {
+        for (const auto &to_state : v) {
+            auto symbol_node = std::make_unique<RegexAST>(SymbolAST(k.second));
+            auto it = strict_ast_map.find({k.first, to_state});
+            if (it == strict_ast_map.end())
+                strict_ast_map.insert({{k.first, to_state}, std::move(symbol_node)});
+            else
+                it->second = std::make_unique<RegexAST>(AlternationAST(std::move(it->second), std::move(symbol_node)));
+        }
+    }
+
+    auto states_copy = automaton.m_states;
+    for (const auto &q_state : automaton.m_states) {
+        if (q_state == new_initial || q_state == new_final)
+            continue;
+
+        states_copy.erase(q_state);
+        for (const auto &p_state : states_copy) {
+            for (const auto &r_state : states_copy) {
+                auto pq = strict_ast_map.find({p_state, q_state});
+                auto qr = strict_ast_map.find({q_state, r_state});
+                if (pq == strict_ast_map.end() || qr == strict_ast_map.end())
+                    continue;
+                auto qq = strict_ast_map.find({q_state, q_state});
+                auto pr = strict_ast_map.find({p_state, r_state});
+
+                auto result = std::move(pq->second);
+                if (qq != strict_ast_map.end()) {
+                    auto loop_ast = std::make_unique<RegexAST>(ZeroOrMoreAST(std::move(qq->second)));
+                    result = std::make_unique<RegexAST>(ConcatenationAST(std::move(result), std::move(loop_ast)));
+                }
+                result = std::make_unique<RegexAST>(ConcatenationAST(std::move(result), std::move(qr->second)));
+                if (pr != strict_ast_map.end())
+                    result = std::make_unique<RegexAST>(AlternationAST(std::move(result), std::move(pr->second)));
+
+                strict_ast_map[{p_state, r_state}] = std::move(result);
+            }
+        }
+    }
+
+    return ast_to_string(*strict_ast_map[{new_initial, new_final}]);
+}
 
 const std::set<char> &FiniteAutomaton::get_alphabet() const { return m_alphabet; }
 
