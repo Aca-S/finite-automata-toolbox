@@ -9,6 +9,8 @@
 #include <string>
 #include <string_view>
 
+#include <iostream>
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -188,6 +190,15 @@ template <typename T> QList<T *> get_selected(QGraphicsScene *scene)
     return QList<T *>(selected.begin(), selected.end());
 }
 
+template <typename T> QList<T *> get_items(QGraphicsScene *scene)
+{
+    using namespace std::views;
+
+    auto selected = scene->items() | transform([](auto *item) { return qgraphicsitem_cast<T *>(item); })
+                    | filter([](auto *item) { return item != nullptr; });
+    return QList<T *>(selected.begin(), selected.end());
+}
+
 void execute_unary_operation(QGraphicsView *view, const auto &operation)
 {
     for (auto *graph : get_selected<AutomatonGraph>(view->scene())) {
@@ -280,6 +291,7 @@ void MainWindow::setup_view_dock()
 
     connect(ui->view_selected_btn, &QPushButton::clicked, this, [=]() {
         ui->select_view->scene()->clear();
+        ui->generate_regex_le->clear();
 
         auto graphs = get_selected<AutomatonGraph>(ui->main_view->scene());
 
@@ -288,6 +300,17 @@ void MainWindow::setup_view_dock()
             new_graph->setFlag(QGraphicsItem::ItemIsSelectable, false);
             new_graph->setFlag(QGraphicsItem::ItemIsMovable, false);
             add_item_at_pos(new_graph, ui->select_view->scene(), {0, 0});
+        }
+    });
+
+    connect(ui->generate_regex_btn, &QPushButton::clicked, this, [=]() {
+        auto graphs = get_items<AutomatonGraph>(ui->select_view->scene());
+        if (graphs.size() > 0) {
+            auto regex = graphs.at(0)->get_automaton().generate_regex();
+            if (regex)
+                ui->generate_regex_le->setText(QString::fromStdString(*regex));
+            else
+                ui->generate_regex_le->setText("No regular expression matches selected automaton.");
         }
     });
 }

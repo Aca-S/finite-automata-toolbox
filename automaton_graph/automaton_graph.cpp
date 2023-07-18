@@ -54,4 +54,6 @@ void AutomatonGraph::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         painter->drawRect(boundingRect());
 }
 
+int AutomatonGraph::type() const { return Type; }
+
 const FiniteAutomaton &AutomatonGraph::get_automaton() const { return m_automaton; }
