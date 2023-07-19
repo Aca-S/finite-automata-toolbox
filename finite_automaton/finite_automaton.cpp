@@ -319,12 +319,7 @@ std::string ast_to_string(const RegexAST &ast)
             [&ast](const ZeroOrOneAST &node) { return node_to_string(node.get_operand(), ast) + "?"; },
             [&ast](const ZeroOrMoreAST &node) { return node_to_string(node.get_operand(), ast) + "*"; },
             [&ast](const OneOrMoreAST &node) { return node_to_string(node.get_operand(), ast) + "+"; },
-            [&ast](const SymbolAST &node) {
-                if (node.get_symbol() == FiniteAutomaton::epsilon_transition_value)
-                    return std::string("");
-                else
-                    return std::string(1, node.get_symbol());
-            }},
+            [&ast](const SymbolAST &node) { return std::string(1, node.get_symbol()); }},
         ast);
 }
 } // namespace
