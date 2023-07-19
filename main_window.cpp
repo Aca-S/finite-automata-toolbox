@@ -289,28 +289,38 @@ void MainWindow::setup_view_dock()
 {
     ui->select_view->setScene(new QGraphicsScene(this));
 
-    connect(ui->view_selected_btn, &QPushButton::clicked, this, [=]() {
-        ui->select_view->scene()->clear();
-        ui->generate_regex_le->clear();
+    connect(ui->view_selected_btn, &QPushButton::clicked, this, [=]() { bring_selected_to_view(); });
 
-        auto graphs = get_selected<AutomatonGraph>(ui->main_view->scene());
+    connect(ui->generate_regex_btn, &QPushButton::clicked, this, [=]() { generate_regex(); });
+}
 
-        if (graphs.size() > 0) {
-            auto *new_graph = new AutomatonGraph(graphs.at(0)->get_automaton());
-            new_graph->setFlag(QGraphicsItem::ItemIsSelectable, false);
-            new_graph->setFlag(QGraphicsItem::ItemIsMovable, false);
-            add_item_at_pos(new_graph, ui->select_view->scene(), {0, 0});
-        }
-    });
+void MainWindow::bring_selected_to_view()
+{
+    ui->select_view->scene()->clear();
+    ui->generate_regex_le->clear();
+    ui->view_dock_info->setText("");
 
-    connect(ui->generate_regex_btn, &QPushButton::clicked, this, [=]() {
-        auto graphs = get_items<AutomatonGraph>(ui->select_view->scene());
-        if (graphs.size() > 0) {
-            auto regex = graphs.at(0)->get_automaton().generate_regex();
-            if (regex)
-                ui->generate_regex_le->setText(QString::fromStdString(*regex));
-            else
-                ui->generate_regex_le->setText("No regular expression matches selected automaton.");
-        }
-    });
+    auto graphs = get_selected<AutomatonGraph>(ui->main_view->scene());
+
+    if (graphs.size() > 0) {
+        auto *new_graph = new AutomatonGraph(graphs.at(0)->get_automaton());
+        new_graph->setFlag(QGraphicsItem::ItemIsSelectable, false);
+        new_graph->setFlag(QGraphicsItem::ItemIsMovable, false);
+        add_item_at_pos(new_graph, ui->select_view->scene(), {0, 0});
+    } else
+        ui->view_dock_info->setText("An automaton must be selected from the main view.");
+}
+
+void MainWindow::generate_regex()
+{
+    ui->view_dock_info->setText("");
+    auto graphs = get_items<AutomatonGraph>(ui->select_view->scene());
+    if (graphs.size() > 0) {
+        auto regex = graphs.at(0)->get_automaton().generate_regex();
+        if (regex)
+            ui->generate_regex_le->setText(QString::fromStdString(*regex));
+        else
+            ui->view_dock_info->setText("No regular expression matches selected automaton.");
+    } else
+        ui->view_dock_info->setText("An automaton must be selected.");
 }

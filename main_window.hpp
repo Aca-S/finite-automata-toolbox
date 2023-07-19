@@ -25,6 +25,8 @@ class MainWindow : public QMainWindow
     void setup_operations_dock();
 
     void setup_view_dock();
+    void bring_selected_to_view();
+    void generate_regex();
 
     Ui::MainWindow *ui;
 };
