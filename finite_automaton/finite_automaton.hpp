@@ -33,6 +33,8 @@ class FiniteAutomaton
     FiniteAutomaton difference_with(const FiniteAutomaton &other) const;
 
     std::optional<std::string> generate_regex() const;
+    std::optional<std::string> generate_valid_word() const;
+    std::optional<std::string> generate_invalid_word() const;
 
     const std::set<char> &get_alphabet() const;
     const std::set<unsigned> &get_states() const;

@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <queue>
+#include <random>
 #include <ranges>
 
 std::expected<FiniteAutomaton, std::string> FiniteAutomaton::construct(
@@ -328,7 +329,7 @@ std::optional<std::string> FiniteAutomaton::generate_regex() const
 {
     const auto &eps = FiniteAutomaton::epsilon_transition_value;
 
-    // Node: Can also just be determinized instead of minimized,
+    // Note: Can also just be determinized instead of minimized,
     // but this way the resulting regex will be shorter.
     auto automaton = minimize().complete();
 
@@ -392,6 +393,49 @@ std::optional<std::string> FiniteAutomaton::generate_regex() const
     else
         return ast_to_string(*RegexDriver().parse(it->second));
 }
+
+namespace {
+static std::random_device seeder;
+static std::mt19937 random_engine(seeder());
+} // namespace
+
+std::optional<std::string> FiniteAutomaton::generate_valid_word() const
+{
+    size_t max_valid = 200;
+    unsigned max_state_visits = 100;
+
+    auto automaton = minimize().complete();
+
+    std::vector<std::string> valid_words;
+    std::vector<unsigned> state_visits(automaton.m_states.size(), 0);
+
+    std::queue<std::pair<unsigned, std::string>> traversal_queue;
+    traversal_queue.push({*automaton.m_initial_states.begin(), ""});
+    while (!traversal_queue.empty() && valid_words.size() < max_valid) {
+        const auto [current_state, current_word] = traversal_queue.front();
+        traversal_queue.pop();
+
+        if (automaton.m_final_states.contains(current_state))
+            valid_words.push_back(current_word);
+
+        for (const auto &symbol : automaton.m_alphabet) {
+            unsigned new_state = *automaton.m_transition_function[{current_state, symbol}].begin();
+            if (state_visits[new_state] < max_state_visits) {
+                traversal_queue.push({new_state, current_word + symbol});
+                ++state_visits[new_state];
+            }
+        }
+    }
+
+    if (valid_words.empty())
+        return std::nullopt;
+
+    std::uniform_int_distribution<size_t> random_position(0, valid_words.size() - 1);
+
+    return valid_words[random_position(random_engine)];
+}
+
+std::optional<std::string> FiniteAutomaton::generate_invalid_word() const { return complement().generate_valid_word(); }
 
 const std::set<char> &FiniteAutomaton::get_alphabet() const { return m_alphabet; }
 
