@@ -305,6 +305,13 @@ void MainWindow::setup_view_dock()
 {
     ui->select_view->setScene(new QGraphicsScene(this));
 
+    QString symbol_regex = "[!-~]";
+    QRegularExpression symbols_only_regex("^" + symbol_regex + "*$");
+    auto word_validator = new QRegularExpressionValidator(symbols_only_regex, this);
+    set_validator(
+        ui->test_word_le, word_validator, ui->view_dock_info,
+        "Only printable ASCII symbols are allowed in the testing word.");
+
     connect(ui->view_selected_btn, &QPushButton::clicked, this, [=]() { bring_selected_to_view(); });
 
     connect(ui->generate_regex_btn, &QPushButton::clicked, this, [=]() {
