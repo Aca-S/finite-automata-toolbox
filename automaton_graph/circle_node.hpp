@@ -1,10 +1,10 @@
 #ifndef CIRCLE_NODE_HPP
 #define CIRCLE_NODE_HPP
 
-#include "node.hpp"
+#include "automaton_node.hpp"
 
 // Graphical representation of non-final state automaton nodes.
-class CircleNode : public Node
+class CircleNode : public AutomatonNode
 {
   public:
     CircleNode(qreal size, const QString &label, const QFont &label_font = QFont("Times-Roman", 12));

@@ -11,9 +11,9 @@ AutomatonGraph::AutomatonGraph(const FiniteAutomaton &automaton) : Graph(), m_au
 {
     qreal node_size = 50;
 
-    QMap<unsigned, Node *> node_map;
+    QMap<unsigned, AutomatonNode *> node_map;
     for (const auto &state : m_automaton.get_states()) {
-        Node *node;
+        AutomatonNode *node;
         if (m_automaton.get_final_states().contains(state))
             node = new DoubleCircleNode(node_size, node_size - 8, QString::number(state));
         else

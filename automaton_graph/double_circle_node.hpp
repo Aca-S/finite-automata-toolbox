@@ -1,10 +1,10 @@
 #ifndef DOUBLE_CIRCLE_NODE_HPP
 #define DOUBLE_CIRCLE_NODE_HPP
 
-#include "node.hpp"
+#include "automaton_node.hpp"
 
 // Graphical representation of final state automaton nodes.
-class DoubleCircleNode : public Node
+class DoubleCircleNode : public AutomatonNode
 {
   public:
     DoubleCircleNode(
