@@ -11,7 +11,6 @@ AutomatonGraph::AutomatonGraph(const FiniteAutomaton &automaton) : Graph(), m_au
 {
     qreal node_size = 50;
 
-    QMap<unsigned, AutomatonNode *> node_map;
     for (const auto &state : m_automaton.get_states()) {
         AutomatonNode *node;
         if (m_automaton.get_final_states().contains(state))
@@ -19,7 +18,7 @@ AutomatonGraph::AutomatonGraph(const FiniteAutomaton &automaton) : Graph(), m_au
         else
             node = new CircleNode(node_size, QString::number(state));
         add_node(node);
-        node_map.insert(state, node);
+        m_node_map.insert(state, node);
 
         if (m_automaton.get_initial_states().contains(state)) {
             Node *invisible_node = new InvisibleNode();
@@ -34,7 +33,7 @@ AutomatonGraph::AutomatonGraph(const FiniteAutomaton &automaton) : Graph(), m_au
             QString label = k.second == FiniteAutomaton::epsilon_transition_value ? QString::fromUtf8("\u03B5")
                                                                                   : QString(QChar(k.second));
             Edge *edge = new TransitionEdge(label);
-            add_edge(edge, node_map[k.first], node_map[to_state]);
+            add_edge(edge, m_node_map[k.first], m_node_map[to_state]);
         }
     }
 
