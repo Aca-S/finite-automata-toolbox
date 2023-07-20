@@ -283,17 +283,48 @@ void MainWindow::setup_operations_dock()
     connect(ui->delete_btn, &QPushButton::clicked, this, [=]() { execute_delete(ui->main_view); });
 }
 
+namespace {
+void execute_generator_operation(
+    QGraphicsView *view, QLineEdit *result_le, QLabel *info_label, const QString &impossible_message,
+    const auto &operation)
+{
+    info_label->setText("");
+    auto graphs = get_items<AutomatonGraph>(view->scene());
+    if (graphs.size() > 0) {
+        auto generated = (graphs.at(0)->get_automaton().*operation)();
+        if (generated)
+            result_le->setText(QString::fromStdString(*generated));
+        else
+            info_label->setText(impossible_message);
+    } else
+        info_label->setText("An automaton must be selected.");
+}
+} // namespace
+
 void MainWindow::setup_view_dock()
 {
     ui->select_view->setScene(new QGraphicsScene(this));
 
     connect(ui->view_selected_btn, &QPushButton::clicked, this, [=]() { bring_selected_to_view(); });
 
-    connect(ui->generate_regex_btn, &QPushButton::clicked, this, [=]() { generate_regex(); });
+    connect(ui->generate_regex_btn, &QPushButton::clicked, this, [=]() {
+        execute_generator_operation(
+            ui->select_view, ui->generate_regex_le, ui->view_dock_info,
+            "No regular expression matches selected automaton", &FiniteAutomaton::generate_regex);
+    });
 
-    connect(ui->generate_acceptable_btn, &QPushButton::clicked, this, [=]() { generate_acceptable(); });
+    connect(ui->generate_acceptable_btn, &QPushButton::clicked, this, [=]() {
+        execute_generator_operation(
+            ui->select_view, ui->test_word_le, ui->view_dock_info,
+            "No acceptable words exist for the selected automaton.", &FiniteAutomaton::generate_valid_word);
+    });
 
-    connect(ui->generate_unacceptable_btn, &QPushButton::clicked, this, [=]() { generate_unacceptable(); });
+    connect(ui->generate_unacceptable_btn, &QPushButton::clicked, this, [=]() {
+        execute_generator_operation(
+            ui->select_view, ui->test_word_le, ui->view_dock_info,
+            "No unacceptable words, under its alphabet, exist for the selected automaton.",
+            &FiniteAutomaton::generate_invalid_word);
+    });
 }
 
 void MainWindow::bring_selected_to_view()
@@ -311,46 +342,4 @@ void MainWindow::bring_selected_to_view()
         add_item_at_pos(new_graph, ui->select_view->scene(), {0, 0});
     } else
         ui->view_dock_info->setText("An automaton must be selected from the main view.");
-}
-
-void MainWindow::generate_regex()
-{
-    ui->view_dock_info->setText("");
-    auto graphs = get_items<AutomatonGraph>(ui->select_view->scene());
-    if (graphs.size() > 0) {
-        auto regex = graphs.at(0)->get_automaton().generate_regex();
-        if (regex)
-            ui->generate_regex_le->setText(QString::fromStdString(*regex));
-        else
-            ui->view_dock_info->setText("No regular expression matches selected automaton.");
-    } else
-        ui->view_dock_info->setText("An automaton must be selected.");
-}
-
-void MainWindow::generate_acceptable()
-{
-    ui->view_dock_info->setText("");
-    auto graphs = get_items<AutomatonGraph>(ui->select_view->scene());
-    if (graphs.size() > 0) {
-        auto word = graphs.at(0)->get_automaton().generate_valid_word();
-        if (word)
-            ui->test_word_le->setText(QString::fromStdString(*word));
-        else
-            ui->view_dock_info->setText("No acceptable words exist for the selected automaton.");
-    } else
-        ui->view_dock_info->setText("An automaton must be selected.");
-}
-
-void MainWindow::generate_unacceptable()
-{
-    ui->view_dock_info->setText("");
-    auto graphs = get_items<AutomatonGraph>(ui->select_view->scene());
-    if (graphs.size() > 0) {
-        auto word = graphs.at(0)->get_automaton().generate_invalid_word();
-        if (word)
-            ui->test_word_le->setText(QString::fromStdString(*word));
-        else
-            ui->view_dock_info->setText("No unacceptable words, under its alphabet, exist for the selected automaton.");
-    } else
-        ui->view_dock_info->setText("An automaton must be selected.");
 }
