@@ -301,6 +301,24 @@ void execute_generator_operation(
     } else
         info_label->setText("An automaton must be selected.");
 }
+
+void execute_matcher_operation(
+    QGraphicsView *view, QLineEdit *word_le, QLabel *info_label, std::optional<MatchSimulator> &match_simulator,
+    const auto &operation, bool execute_initial_operation)
+{
+    info_label->setText("");
+    auto graphs = get_items<AutomatonGraph>(view->scene());
+    if (graphs.size() > 0) {
+        auto graph = graphs.at(0);
+        if (!match_simulator) {
+            match_simulator = MatchSimulator(graph, word_le->text());
+            if (execute_initial_operation)
+                (match_simulator.value().*operation)();
+        } else
+            (match_simulator.value().*operation)();
+    } else
+        info_label->setText("An automaton must be selected.");
+}
 } // namespace
 
 void MainWindow::setup_view_dock()
@@ -339,7 +357,33 @@ void MainWindow::setup_view_dock()
 
     connect(ui->view_selected_btn, &QPushButton::clicked, this, [&]() { match_simulator.reset(); });
 
-    connect(ui->test_word_le, &QLineEdit::textChanged, this, [&]() { match_simulator.reset(); });
+    connect(ui->test_word_le, &QLineEdit::textChanged, this, [&]() {
+        if (match_simulator) {
+            match_simulator->clear_active();
+            match_simulator.reset();
+        }
+    });
+
+    connect(ui->test_reset_btn, &QPushButton::clicked, this, [&]() {
+        execute_matcher_operation(
+            ui->select_view, ui->test_word_le, ui->view_dock_info, match_simulator, &MatchSimulator::first_step, false);
+    });
+
+    connect(ui->test_back_btn, &QPushButton::clicked, this, [&]() {
+        execute_matcher_operation(
+            ui->select_view, ui->test_word_le, ui->view_dock_info, match_simulator, &MatchSimulator::previous_step,
+            false);
+    });
+
+    connect(ui->test_forward_btn, &QPushButton::clicked, this, [&]() {
+        execute_matcher_operation(
+            ui->select_view, ui->test_word_le, ui->view_dock_info, match_simulator, &MatchSimulator::next_step, false);
+    });
+
+    connect(ui->test_end_btn, &QPushButton::clicked, this, [&]() {
+        execute_matcher_operation(
+            ui->select_view, ui->test_word_le, ui->view_dock_info, match_simulator, &MatchSimulator::last_step, true);
+    });
 }
 
 void MainWindow::bring_selected_to_view()

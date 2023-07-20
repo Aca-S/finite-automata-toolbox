@@ -9,12 +9,11 @@ MatchSimulator::MatchSimulator(AutomatonGraph *graph, const QString &word)
         m_graph->m_node_map[state]->activate();
 }
 
-MatchSimulator::~MatchSimulator() { clear_active(); }
-
 void MatchSimulator::first_step()
 {
     clear_active();
-    for (const auto &state : m_match_steps[0])
+    m_current_step = 0;
+    for (const auto &state : m_match_steps[m_current_step])
         m_graph->m_node_map[state]->activate();
 }
 
@@ -39,7 +38,8 @@ void MatchSimulator::next_step()
 void MatchSimulator::last_step()
 {
     clear_active();
-    for (const auto &state : m_match_steps[m_match_steps.size() - 1])
+    m_current_step = m_match_steps.size() - 1;
+    for (const auto &state : m_match_steps[m_current_step])
         m_graph->m_node_map[state]->activate();
 }
 
