@@ -3,8 +3,10 @@
 
 #include "automaton_graph.hpp"
 #include "finite_automaton.hpp"
+#include "match_simulator.hpp"
 
 #include <iterator>
+#include <optional>
 #include <ranges>
 #include <string>
 #include <string_view>
@@ -332,6 +334,12 @@ void MainWindow::setup_view_dock()
             "No unacceptable words, under its alphabet, exist for the selected automaton.",
             &FiniteAutomaton::generate_invalid_word);
     });
+
+    static std::optional<MatchSimulator> match_simulator;
+
+    connect(ui->view_selected_btn, &QPushButton::clicked, this, [&]() { match_simulator.reset(); });
+
+    connect(ui->test_word_le, &QLineEdit::textChanged, this, [&]() { match_simulator.reset(); });
 }
 
 void MainWindow::bring_selected_to_view()
