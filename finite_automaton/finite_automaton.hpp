@@ -7,6 +7,7 @@
 #include <set>
 #include <string>
 #include <utility>
+#include <vector>
 
 class FiniteAutomaton
 {
@@ -21,6 +22,7 @@ class FiniteAutomaton
     static std::expected<FiniteAutomaton, std::string> construct(const std::string &regex);
 
     bool accepts(const std::string &word) const;
+    std::vector<std::set<unsigned>> generate_match_steps(const std::string &word) const;
 
     FiniteAutomaton determinize() const;
     FiniteAutomaton complete() const;

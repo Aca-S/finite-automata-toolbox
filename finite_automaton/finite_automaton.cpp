@@ -152,6 +152,31 @@ bool FiniteAutomaton::accepts(const std::string &word) const
     return std::ranges::any_of(current_states, [this](const auto &s) { return m_final_states.contains(s); });
 }
 
+std::vector<std::set<unsigned>> FiniteAutomaton::generate_match_steps(const std::string &word) const
+{
+    std::vector<std::set<unsigned>> match_steps;
+
+    auto current_states = epsilon_closure(m_initial_states);
+    match_steps.push_back(current_states);
+
+    for (const auto &symbol : word) {
+        std::set<unsigned> after_transition_states;
+        const auto ins = std::inserter(after_transition_states, after_transition_states.end());
+        for (const auto &state : current_states) {
+            auto it = m_transition_function.find({state, symbol});
+            if (it != m_transition_function.end())
+                std::ranges::set_union(after_transition_states, it->second, ins);
+        }
+        if (!after_transition_states.empty()) {
+            current_states = epsilon_closure(after_transition_states);
+            match_steps.push_back(current_states);
+        } else
+            break;
+    }
+
+    return match_steps;
+}
+
 FiniteAutomaton FiniteAutomaton::determinize() const
 {
     std::set<unsigned> determinized_states;
