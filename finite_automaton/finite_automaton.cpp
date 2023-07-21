@@ -170,8 +170,10 @@ std::vector<std::set<unsigned>> FiniteAutomaton::generate_match_steps(const std:
         if (!after_transition_states.empty()) {
             current_states = epsilon_closure(after_transition_states);
             match_steps.push_back(current_states);
-        } else
+        } else {
+            match_steps.push_back({});
             break;
+        }
     }
 
     return match_steps;
