@@ -9,6 +9,7 @@ qt_add_library(
     invisible_node.cpp
     transition_edge.cpp
     automaton_graph.cpp
+    match_simulator.cpp
 )
 
 target_link_libraries(
