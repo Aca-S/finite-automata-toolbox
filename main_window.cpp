@@ -393,7 +393,7 @@ void MainWindow::bring_selected_to_view()
         auto *new_graph = new AutomatonGraph(graphs.at(0)->get_automaton());
         new_graph->setFlag(QGraphicsItem::ItemIsSelectable, false);
         new_graph->setFlag(QGraphicsItem::ItemIsMovable, false);
-        add_item_at_pos(new_graph, ui->select_view->scene(), {0, 0});
+        add_item_at_pos(new_graph, ui->select_view->scene(), get_viewport_center_pos(ui->select_view));
     } else
         ui->view_dock_info->setText("An automaton must be selected from the main view.");
 }

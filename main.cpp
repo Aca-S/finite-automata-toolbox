@@ -1,4 +1,3 @@
-#include "finite_automaton.hpp"
 #include "main_window.hpp"
 
 #include <QApplication>

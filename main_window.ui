@@ -53,7 +53,7 @@
      <item>
       <layout class="QVBoxLayout" name="select_view_dock_layout">
        <item>
-        <widget class="QGraphicsView" name="select_view"/>
+        <widget class="SideGraphicsView" name="select_view"/>
        </item>
        <item>
         <widget class="QPushButton" name="view_selected_btn">
@@ -478,6 +478,11 @@
    <class>MainGraphicsView</class>
    <extends>QGraphicsView</extends>
    <header>main_graphics_view.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>SideGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">side_graphics_view.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>
