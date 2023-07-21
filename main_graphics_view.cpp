@@ -6,6 +6,7 @@
 MainGraphicsView::MainGraphicsView(QWidget *parent) : QGraphicsView(parent)
 {
     setDragMode(QGraphicsView::ScrollHandDrag);
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setSceneRect(-16000, -16000, 32000, 32000);
@@ -30,8 +31,6 @@ void MainGraphicsView::wheelEvent(QWheelEvent *event)
     qreal factor_of_change = 1.1;
     qreal max_scale_factor = 1.5;
     qreal min_scale_factor = 0.35;
-
-    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
     if (event->angleDelta().y() > 0) {
         qreal new_scale_factor = m_current_scale_factor * factor_of_change;
