@@ -3,6 +3,7 @@
 
 #include "automaton_graph.hpp"
 
+#include <QLineEdit>
 #include <QObject>
 #include <QString>
 
@@ -14,7 +15,7 @@ class MatchSimulator : public QObject
     Q_OBJECT
 
   public:
-    MatchSimulator(AutomatonGraph *graph, const QString &word);
+    MatchSimulator(AutomatonGraph *graph, QLineEdit *word_le);
     ~MatchSimulator();
 
     void first_step();
@@ -28,8 +29,11 @@ class MatchSimulator : public QObject
 
   private:
     AutomatonGraph *m_graph;
+    QLineEdit *m_word_le;
+
     std::vector<std::set<unsigned>> m_match_steps;
-    size_t m_current_step;
+    size_t m_current_step = 0;
+    int m_word_position = 0;
 };
 
 #endif // MATCH_SIMULATOR_HPP

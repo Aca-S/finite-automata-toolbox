@@ -167,13 +167,8 @@ std::vector<std::set<unsigned>> FiniteAutomaton::generate_match_steps(const std:
             if (it != m_transition_function.end())
                 std::ranges::set_union(after_transition_states, it->second, ins);
         }
-        if (!after_transition_states.empty()) {
-            current_states = epsilon_closure(after_transition_states);
-            match_steps.push_back(current_states);
-        } else {
-            match_steps.push_back({});
-            break;
-        }
+        current_states = epsilon_closure(after_transition_states);
+        match_steps.push_back(current_states);
     }
 
     return match_steps;

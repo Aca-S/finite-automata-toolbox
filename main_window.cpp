@@ -311,7 +311,7 @@ void execute_matcher_operation(
     if (graphs.size() > 0) {
         auto graph = graphs.at(0);
         if (!match_simulator) {
-            match_simulator.emplace(graph, word_le->text());
+            match_simulator.emplace(graph, word_le);
             if (execute_initial_operation)
                 (match_simulator.value().*operation)();
         } else
