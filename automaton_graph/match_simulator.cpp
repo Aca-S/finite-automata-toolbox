@@ -5,46 +5,39 @@ MatchSimulator::MatchSimulator(AutomatonGraph *graph, const QString &word)
       m_match_steps(m_graph->get_automaton().generate_match_steps(std::string(word.toUtf8().constData()))),
       m_current_step(0)
 {
-    for (const auto &state : m_match_steps[0])
-        m_graph->m_node_map[state]->activate();
+    connect(this, &MatchSimulator::activate_state_nodes, m_graph, &AutomatonGraph::activate_state_nodes);
+    connect(this, &MatchSimulator::deactivate_state_nodes, m_graph, &AutomatonGraph::deactivate_state_nodes);
+    emit activate_state_nodes(m_match_steps[m_current_step]);
 }
+
+MatchSimulator::~MatchSimulator() { emit deactivate_state_nodes(m_match_steps[m_current_step]); }
 
 void MatchSimulator::first_step()
 {
-    clear_active();
+    emit deactivate_state_nodes(m_match_steps[m_current_step]);
     m_current_step = 0;
-    for (const auto &state : m_match_steps[m_current_step])
-        m_graph->m_node_map[state]->activate();
+    emit activate_state_nodes(m_match_steps[m_current_step]);
 }
 
 void MatchSimulator::previous_step()
 {
     if (m_current_step > 0) {
-        clear_active();
-        for (const auto &state : m_match_steps[--m_current_step])
-            m_graph->m_node_map[state]->activate();
+        emit deactivate_state_nodes(m_match_steps[m_current_step]);
+        emit activate_state_nodes(m_match_steps[--m_current_step]);
     }
 }
 
 void MatchSimulator::next_step()
 {
     if (m_current_step < m_match_steps.size() - 1) {
-        clear_active();
-        for (const auto &state : m_match_steps[++m_current_step])
-            m_graph->m_node_map[state]->activate();
+        emit deactivate_state_nodes(m_match_steps[m_current_step]);
+        emit activate_state_nodes(m_match_steps[++m_current_step]);
     }
 }
 
 void MatchSimulator::last_step()
 {
-    clear_active();
+    emit deactivate_state_nodes(m_match_steps[m_current_step]);
     m_current_step = m_match_steps.size() - 1;
-    for (const auto &state : m_match_steps[m_current_step])
-        m_graph->m_node_map[state]->activate();
-}
-
-void MatchSimulator::clear_active()
-{
-    for (const auto &state : m_match_steps[m_current_step])
-        m_graph->m_node_map[state]->deactivate();
+    emit activate_state_nodes(m_match_steps[m_current_step]);
 }

@@ -56,3 +56,15 @@ void AutomatonGraph::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 int AutomatonGraph::type() const { return Type; }
 
 const FiniteAutomaton &AutomatonGraph::get_automaton() const { return m_automaton; }
+
+void AutomatonGraph::activate_state_nodes(const std::set<unsigned> &states)
+{
+    for (const auto &state : states)
+        m_node_map[state]->activate();
+}
+
+void AutomatonGraph::deactivate_state_nodes(const std::set<unsigned> &states)
+{
+    for (const auto &state : states)
+        m_node_map[state]->deactivate();
+}

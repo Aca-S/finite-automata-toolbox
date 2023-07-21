@@ -5,10 +5,14 @@
 #include "finite_automaton.hpp"
 #include "graph.hpp"
 
+#include <QObject>
+
+#include <set>
+
 // Graphical representation of a finite automaton.
-class AutomatonGraph : public Graph
+class AutomatonGraph : public QObject, public Graph
 {
-    friend class MatchSimulator;
+    Q_OBJECT
 
   public:
     AutomatonGraph(const FiniteAutomaton &automaton);
@@ -23,6 +27,10 @@ class AutomatonGraph : public Graph
     int type() const override;
 
     const FiniteAutomaton &get_automaton() const;
+
+  public slots:
+    void activate_state_nodes(const std::set<unsigned> &states);
+    void deactivate_state_nodes(const std::set<unsigned> &states);
 
   private:
     FiniteAutomaton m_automaton;

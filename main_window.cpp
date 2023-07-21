@@ -311,7 +311,7 @@ void execute_matcher_operation(
     if (graphs.size() > 0) {
         auto graph = graphs.at(0);
         if (!match_simulator) {
-            match_simulator = MatchSimulator(graph, word_le->text());
+            match_simulator.emplace(graph, word_le->text());
             if (execute_initial_operation)
                 (match_simulator.value().*operation)();
         } else
@@ -357,12 +357,7 @@ void MainWindow::setup_view_dock()
 
     connect(ui->view_selected_btn, &QPushButton::clicked, this, [&]() { match_simulator.reset(); });
 
-    connect(ui->test_word_le, &QLineEdit::textChanged, this, [&]() {
-        if (match_simulator) {
-            match_simulator->clear_active();
-            match_simulator.reset();
-        }
-    });
+    connect(ui->test_word_le, &QLineEdit::textChanged, this, [&]() { match_simulator.reset(); });
 
     connect(ui->test_reset_btn, &QPushButton::clicked, this, [&]() {
         execute_matcher_operation(
