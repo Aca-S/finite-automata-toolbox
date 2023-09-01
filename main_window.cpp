@@ -1,6 +1,8 @@
 #include "main_window.hpp"
 #include "./ui_main_window.h"
 
+#include "operations_dock.hpp"
+
 #include "automaton_graph.hpp"
 #include "finite_automaton.hpp"
 #include "match_simulator.hpp"
@@ -18,8 +20,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QGraphicsScene *scene = new QGraphicsScene(this);
     ui->main_view->setScene(scene);
 
+    this->addDockWidget(Qt::RightDockWidgetArea, new OperationsDock(ui->main_view, this));
+
     setup_construction_dock();
-    setup_operations_dock();
     setup_view_dock();
 }
 
@@ -198,92 +201,7 @@ template <typename T> QList<T *> get_items(QGraphicsScene *scene)
                     | filter([](auto *item) { return item != nullptr; });
     return QList<T *>(selected.begin(), selected.end());
 }
-
-void execute_unary_operation(QGraphicsView *view, const auto &operation)
-{
-    for (auto *graph : get_selected<AutomatonGraph>(view->scene())) {
-        auto *new_graph = new AutomatonGraph((graph->get_automaton().*operation)());
-        add_item_at_pos(new_graph, view->scene(), get_center_pos(graph));
-        new_graph->setSelected(true);
-        view->scene()->removeItem(graph);
-    }
-}
-
-void execute_binary_operation(QGraphicsView *view, const auto &operation)
-{
-    auto graphs = get_selected<AutomatonGraph>(view->scene());
-
-    // TODO: Can be replaced with one call to std::ranges::fold_left_first
-    // once it's more widely supported.
-    if (graphs.size() > 1) {
-        auto it = graphs.begin();
-        auto acc = (*it)->get_automaton();
-        view->scene()->removeItem(*it);
-        for (std::advance(it, 1); it != graphs.end(); ++it) {
-            acc = (acc.*operation)((*it)->get_automaton());
-            view->scene()->removeItem(*it);
-        }
-        auto *new_graph = new AutomatonGraph(acc);
-        add_item_at_pos(new_graph, view->scene(), get_viewport_center_pos(view));
-        new_graph->setSelected(true);
-    }
-}
-
-void execute_clone(QGraphicsView *view)
-{
-    for (auto *graph : get_selected<AutomatonGraph>(view->scene())) {
-        auto *new_graph = new AutomatonGraph((graph->get_automaton()));
-        add_item_at_pos(new_graph, view->scene(), get_center_pos(graph) + QPointF(20, 20));
-        graph->setSelected(false);
-        new_graph->setSelected(true);
-    }
-}
-
-void execute_delete(QGraphicsView *view)
-{
-    for (auto *graph : get_selected<AutomatonGraph>(view->scene()))
-        view->scene()->removeItem(graph);
-}
 } // namespace
-
-void MainWindow::setup_operations_dock()
-{
-    connect(ui->determinize_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(ui->main_view, &FiniteAutomaton::determinize);
-    });
-
-    connect(ui->minimize_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(ui->main_view, &FiniteAutomaton::minimize);
-    });
-
-    connect(ui->complete_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(ui->main_view, &FiniteAutomaton::complete);
-    });
-
-    connect(ui->reverse_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(ui->main_view, &FiniteAutomaton::reverse);
-    });
-
-    connect(ui->complement_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(ui->main_view, &FiniteAutomaton::complement);
-    });
-
-    connect(ui->union_btn, &QPushButton::clicked, this, [=]() {
-        execute_binary_operation(ui->main_view, &FiniteAutomaton::union_with);
-    });
-
-    connect(ui->intersection_btn, &QPushButton::clicked, this, [=]() {
-        execute_binary_operation(ui->main_view, &FiniteAutomaton::intersection_with);
-    });
-
-    connect(ui->difference_btn, &QPushButton::clicked, this, [=]() {
-        execute_binary_operation(ui->main_view, &FiniteAutomaton::difference_with);
-    });
-
-    connect(ui->clone_btn, &QPushButton::clicked, this, [=]() { execute_clone(ui->main_view); });
-
-    connect(ui->delete_btn, &QPushButton::clicked, this, [=]() { execute_delete(ui->main_view); });
-}
 
 namespace {
 void execute_generator_operation(
