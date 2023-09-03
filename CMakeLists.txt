@@ -19,6 +19,7 @@ qt_add_executable(
     main_graphics_view.cpp
     side_graphics_view.cpp
     operations_dock.cpp
+    creation_dock.cpp
 )
 
 target_link_libraries(

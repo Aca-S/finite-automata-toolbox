@@ -18,10 +18,6 @@ class MainWindow : public QMainWindow
     ~MainWindow();
 
   private:
-    void setup_construction_dock();
-    void construct_by_element();
-    void construct_by_regex();
-
     void setup_view_dock();
     void bring_selected_to_view();
 
