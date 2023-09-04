@@ -1,15 +1,15 @@
 #include "operations_dock.hpp"
+#include "utility.hpp"
 
 #include <QGroupBox>
 #include <QLayout>
 #include <QPushButton>
 
-#include <ranges>
-
 #include "automaton_graph.hpp"
 #include "finite_automaton.hpp"
 
 using namespace Ui;
+using namespace Ui::Utility;
 
 namespace {
 QGroupBox *create_operation_group(const QString &title, QBoxLayout *layout, const QList<QWidget *> &widgets)
@@ -20,30 +20,6 @@ QGroupBox *create_operation_group(const QString &title, QBoxLayout *layout, cons
     group->setLayout(layout);
 
     return group;
-}
-
-QPointF get_center_pos(QGraphicsItem *item)
-{
-    auto br = item->boundingRect();
-    return item->pos() + QPointF(br.width(), br.height()) / 2.0;
-}
-
-QPointF get_viewport_center_pos(QGraphicsView *view) { return view->mapToScene(view->rect().center()); }
-
-void add_item_at_pos(QGraphicsItem *item, QGraphicsScene *scene, const QPointF &center_pos)
-{
-    auto br = item->boundingRect();
-    item->setPos(center_pos - QPointF(br.width(), br.height()) / 2.0);
-    scene->addItem(item);
-}
-
-template <typename T> QList<T *> get_selected(QGraphicsScene *scene)
-{
-    using namespace std::views;
-
-    auto selected = scene->selectedItems() | transform([](auto *item) { return qgraphicsitem_cast<T *>(item); })
-                    | filter([](auto *item) { return item != nullptr; });
-    return QList<T *>(selected.begin(), selected.end());
 }
 
 void execute_unary_operation(QGraphicsView *view, const auto &operation)

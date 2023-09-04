@@ -1,4 +1,5 @@
 #include "creation_dock.hpp"
+#include "utility.hpp"
 
 #include <QApplication>
 #include <QGroupBox>
@@ -12,43 +13,7 @@
 #include "finite_automaton.hpp"
 
 using namespace Ui;
-
-namespace {
-// Sets a line edit validator and optionally an info label which will display
-// a specified message on invalid inputs or when focus has left the line edit
-// while it contains a non-acceptable text.
-void set_validator(
-    QLineEdit *line_edit, QValidator *validator, QLabel *info_label = nullptr, const QString &info_message = "")
-{
-    line_edit->setValidator(validator);
-    if (info_label) {
-        QObject::connect(line_edit, &QLineEdit::textChanged, info_label, [=]() { info_label->setText(""); });
-        QObject::connect(
-            line_edit, &QLineEdit::inputRejected, info_label, [=]() { info_label->setText(info_message); });
-        QObject::connect(qApp, &QApplication::focusChanged, info_label, [=](auto *old, auto *now) {
-            if ((old == line_edit || now == line_edit) && !line_edit->hasAcceptableInput())
-                info_label->setText(info_message);
-            else if (old == line_edit)
-                info_label->setText(""); // Last input was rejected, but without it, the text would be valid.
-        });
-    }
-}
-
-QPointF get_center_pos(QGraphicsItem *item)
-{
-    auto br = item->boundingRect();
-    return item->pos() + QPointF(br.width(), br.height()) / 2.0;
-}
-
-QPointF get_viewport_center_pos(QGraphicsView *view) { return view->mapToScene(view->rect().center()); }
-
-void add_item_at_pos(QGraphicsItem *item, QGraphicsScene *scene, const QPointF &center_pos)
-{
-    auto br = item->boundingRect();
-    item->setPos(center_pos - QPointF(br.width(), br.height()) / 2.0);
-    scene->addItem(item);
-}
-} // namespace
+using namespace Ui::Utility;
 
 CreationDock::CreationDock(QGraphicsView *main_view, QWidget *parent) : QDockWidget(parent), m_main_view(main_view)
 {

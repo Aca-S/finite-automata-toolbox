@@ -1,4 +1,5 @@
 #include "view_dock.hpp"
+#include "utility.hpp"
 
 #include <QApplication>
 #include <QLayout>
@@ -16,43 +17,9 @@
 #include "match_simulator.hpp"
 
 using namespace Ui;
+using namespace Ui::Utility;
 
 namespace {
-// TODO: Extract all of these to util namespace.
-
-template <typename T> QList<T *> get_selected(QGraphicsScene *scene)
-{
-    using namespace std::views;
-
-    auto selected = scene->selectedItems() | transform([](auto *item) { return qgraphicsitem_cast<T *>(item); })
-                    | filter([](auto *item) { return item != nullptr; });
-    return QList<T *>(selected.begin(), selected.end());
-}
-
-template <typename T> QList<T *> get_items(QGraphicsScene *scene)
-{
-    using namespace std::views;
-
-    auto selected = scene->items() | transform([](auto *item) { return qgraphicsitem_cast<T *>(item); })
-                    | filter([](auto *item) { return item != nullptr; });
-    return QList<T *>(selected.begin(), selected.end());
-}
-
-QPointF get_center_pos(QGraphicsItem *item)
-{
-    auto br = item->boundingRect();
-    return item->pos() + QPointF(br.width(), br.height()) / 2.0;
-}
-
-QPointF get_viewport_center_pos(QGraphicsView *view) { return view->mapToScene(view->rect().center()); }
-
-void add_item_at_pos(QGraphicsItem *item, QGraphicsScene *scene, const QPointF &center_pos)
-{
-    auto br = item->boundingRect();
-    item->setPos(center_pos - QPointF(br.width(), br.height()) / 2.0);
-    scene->addItem(item);
-}
-
 void execute_generator_operation(
     QGraphicsView *view, QLineEdit *result_le, QLabel *info_label, const QString &impossible_message,
     const auto &operation)
@@ -85,34 +52,6 @@ void execute_matcher_operation(
             (match_simulator.value().*operation)();
     } else
         info_label->setText("An automaton must be selected.");
-}
-
-// Sets a line edit validator and optionally an info label which will display
-// a specified message on invalid inputs or when focus has left the line edit
-// while it contains a non-acceptable text.
-void set_validator(
-    QLineEdit *line_edit, QValidator *validator, QLabel *info_label = nullptr, const QString &info_message = "")
-{
-    line_edit->setValidator(validator);
-    if (info_label) {
-        QObject::connect(line_edit, &QLineEdit::textChanged, info_label, [=]() { info_label->setText(""); });
-        QObject::connect(
-            line_edit, &QLineEdit::inputRejected, info_label, [=]() { info_label->setText(info_message); });
-        QObject::connect(qApp, &QApplication::focusChanged, info_label, [=](auto *old, auto *now) {
-            if ((old == line_edit || now == line_edit) && !line_edit->hasAcceptableInput())
-                info_label->setText(info_message);
-            else if (old == line_edit)
-                info_label->setText(""); // Last input was rejected, but without it, the text would be valid.
-        });
-    }
-}
-
-QFrame *create_h_line()
-{
-    QFrame *line = new QFrame;
-    line->setFrameShape(QFrame::HLine);
-    line->setFrameShadow(QFrame::Sunken);
-    return line;
 }
 } // namespace
 
