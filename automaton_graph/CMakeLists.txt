@@ -18,3 +18,8 @@ target_link_libraries(
     PUBLIC qt_graph
     PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
 )
+
+target_include_directories(
+    automaton_graph
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
+)

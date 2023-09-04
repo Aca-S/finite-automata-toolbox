@@ -10,14 +10,11 @@ qt_standard_project_setup()
 add_subdirectory(finite_automaton)
 add_subdirectory(qt_graph)
 add_subdirectory(automaton_graph)
+add_subdirectory(ui)
 
 qt_add_executable(
     fat
     main.cpp
-    main_window.cpp
-    operations_dock.cpp
-    creation_dock.cpp
-    view_dock.cpp
 )
 
 target_link_libraries(
@@ -25,6 +22,7 @@ target_link_libraries(
     PUBLIC finite_automaton
     PUBLIC qt_graph
     PUBLIC automaton_graph
+    PUBLIC ui
     PRIVATE Qt6::Widgets
 )
 
@@ -41,6 +39,7 @@ target_include_directories(
     "${PROJECT_SOURCE_DIR}/finite_automaton"
     "${PROJECT_SOURCE_DIR}/qt_graph"
     "${PROJECT_SOURCE_DIR}/automaton_graph"
+    "${PROJECT_SOURCE_DIR}/ui"
 )
 
 # Setting up GoogleTest
