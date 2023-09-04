@@ -1,24 +1,33 @@
 #ifndef MAIN_WINDOW_HPP
 #define MAIN_WINDOW_HPP
 
+#include <QGraphicsView>
 #include <QMainWindow>
-
-QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
-}
-QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    class MainGraphicsView;
+
   public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+};
+
+class MainWindow::MainGraphicsView : public QGraphicsView
+{
+    Q_OBJECT
+
+  public:
+    MainGraphicsView(QWidget *parent = nullptr);
+
+  protected:
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
   private:
-    Ui::MainWindow *ui;
+    qreal m_current_scale_factor = 1.0;
 };
 
 #endif // MAIN_WINDOW_HPP
