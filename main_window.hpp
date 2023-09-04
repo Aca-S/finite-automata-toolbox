@@ -18,9 +18,6 @@ class MainWindow : public QMainWindow
     ~MainWindow();
 
   private:
-    void setup_view_dock();
-    void bring_selected_to_view();
-
     Ui::MainWindow *ui;
 };
 
