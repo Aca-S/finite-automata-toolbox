@@ -9,6 +9,8 @@
 #include "automaton_graph.hpp"
 #include "finite_automaton.hpp"
 
+using namespace Ui;
+
 namespace {
 QGroupBox *create_operation_group(const QString &title, QBoxLayout *layout, const QList<QWidget *> &widgets)
 {

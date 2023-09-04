@@ -11,6 +11,8 @@
 #include "automaton_graph.hpp"
 #include "finite_automaton.hpp"
 
+using namespace Ui;
+
 namespace {
 // Sets a line edit validator and optionally an info label which will display
 // a specified message on invalid inputs or when focus has left the line edit

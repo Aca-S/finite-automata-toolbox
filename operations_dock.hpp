@@ -1,9 +1,10 @@
-#ifndef OPERATIONS_DOCK_HPP
-#define OPERATIONS_DOCK_HPP
+#ifndef UI_OPERATIONS_DOCK_HPP
+#define UI_OPERATIONS_DOCK_HPP
 
 #include <QDockWidget>
 #include <QGraphicsView>
 
+namespace Ui {
 class OperationsDock : public QDockWidget
 {
     Q_OBJECT
@@ -14,5 +15,6 @@ class OperationsDock : public QDockWidget
   private:
     QGraphicsView *m_main_view;
 };
+} // namespace Ui
 
-#endif // OPERATIONS_DOCK_HPP
+#endif // UI_OPERATIONS_DOCK_HPP

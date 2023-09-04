@@ -7,6 +7,8 @@
 #include "operations_dock.hpp"
 #include "view_dock.hpp"
 
+using namespace Ui;
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     this->setWindowTitle("Finite Automata Toolbox");

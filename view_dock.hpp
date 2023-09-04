@@ -1,5 +1,5 @@
-#ifndef VIEW_DOCK_HPP
-#define VIEW_DOCK_HPP
+#ifndef UI_VIEW_DOCK_HPP
+#define UI_VIEW_DOCK_HPP
 
 #include <QDockWidget>
 #include <QGraphicsView>
@@ -7,6 +7,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 
+namespace Ui {
 class ViewDock : public QDockWidget
 {
     Q_OBJECT
@@ -54,5 +55,6 @@ class ViewDock::SideGraphicsView : public QGraphicsView
   private:
     qreal m_current_scale_factor = 1.0;
 };
+} // namespace Ui
 
-#endif // VIEW_DOCK_HPP
+#endif // UI_VIEW_DOCK_HPP

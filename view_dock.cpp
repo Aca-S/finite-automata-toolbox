@@ -15,6 +15,8 @@
 #include "finite_automaton.hpp"
 #include "match_simulator.hpp"
 
+using namespace Ui;
+
 namespace {
 // TODO: Extract all of these to util namespace.
 

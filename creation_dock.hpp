@@ -1,5 +1,5 @@
-#ifndef CREATION_DOCK_HPP
-#define CREATION_DOCK_HPP
+#ifndef UI_CREATION_DOCK_HPP
+#define UI_CREATION_DOCK_HPP
 
 #include <QDockWidget>
 #include <QGraphicsView>
@@ -8,6 +8,7 @@
 #include <QListWidget>
 #include <QPushButton>
 
+namespace Ui {
 class CreationDock : public QDockWidget
 {
     Q_OBJECT
@@ -35,5 +36,6 @@ class CreationDock : public QDockWidget
 
     QGraphicsView *m_main_view;
 };
+} // namespace Ui
 
-#endif // CREATION_DOCK_HPP
+#endif // UI_CREATION_DOCK_HPP
