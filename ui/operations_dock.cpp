@@ -3,7 +3,6 @@
 
 #include <QGroupBox>
 #include <QLayout>
-#include <QPushButton>
 
 #include "automaton_graph.hpp"
 #include "finite_automaton.hpp"
@@ -73,67 +72,96 @@ OperationsDock::OperationsDock(QGraphicsView *main_view, QWidget *parent) : QDoc
 {
     this->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
 
-    auto determinize_btn = new QPushButton("Determinize");
-    auto minimize_btn = new QPushButton("Minimize");
-    auto complete_btn = new QPushButton("Complete");
-    auto reverse_btn = new QPushButton("Reverse");
-    auto complement_btn = new QPushButton("Complement");
-    auto union_btn = new QPushButton("Union");
-    auto intersection_btn = new QPushButton("Intersection");
-    auto difference_btn = new QPushButton("Difference");
-    auto clone_btn = new QPushButton("Clone");
-    auto delete_btn = new QPushButton("Delete");
-
     auto dock_container = new QWidget;
     this->setWidget(dock_container);
     auto main_layout = new QVBoxLayout(dock_container);
 
-    auto unary_group = create_operation_group(
-        "Unary", new QVBoxLayout, {determinize_btn, minimize_btn, complete_btn, reverse_btn, complement_btn});
-    main_layout->addWidget(unary_group);
+    build_unary_group();
+    setup_unary_group();
 
-    auto binary_group =
-        create_operation_group("Binary", new QVBoxLayout, {union_btn, intersection_btn, difference_btn});
-    main_layout->addWidget(binary_group);
+    build_binary_group();
+    setup_binary_group();
 
-    auto general_group = create_operation_group("General", new QVBoxLayout, {clone_btn, delete_btn});
-    main_layout->addWidget(general_group);
+    build_general_group();
+    setup_general_group();
 
     main_layout->addStretch();
+}
 
-    connect(determinize_btn, &QPushButton::clicked, this, [=]() {
+void OperationsDock::build_unary_group()
+{
+    m_determinize_btn = new QPushButton("Determinize");
+    m_minimize_btn = new QPushButton("Minimize");
+    m_complete_btn = new QPushButton("Complete");
+    m_reverse_btn = new QPushButton("Reverse");
+    m_complement_btn = new QPushButton("Complement");
+
+    auto unary_group = create_operation_group(
+        "Unary", new QVBoxLayout, {m_determinize_btn, m_minimize_btn, m_complete_btn, m_reverse_btn, m_complement_btn});
+    this->widget()->layout()->addWidget(unary_group);
+}
+
+void OperationsDock::setup_unary_group()
+{
+    connect(m_determinize_btn, &QPushButton::clicked, this, [=]() {
         execute_unary_operation(m_main_view, &FiniteAutomaton::determinize);
     });
 
-    connect(minimize_btn, &QPushButton::clicked, this, [=]() {
+    connect(m_minimize_btn, &QPushButton::clicked, this, [=]() {
         execute_unary_operation(m_main_view, &FiniteAutomaton::minimize);
     });
 
-    connect(complete_btn, &QPushButton::clicked, this, [=]() {
+    connect(m_complete_btn, &QPushButton::clicked, this, [=]() {
         execute_unary_operation(m_main_view, &FiniteAutomaton::complete);
     });
 
-    connect(reverse_btn, &QPushButton::clicked, this, [=]() {
+    connect(m_reverse_btn, &QPushButton::clicked, this, [=]() {
         execute_unary_operation(m_main_view, &FiniteAutomaton::reverse);
     });
 
-    connect(complement_btn, &QPushButton::clicked, this, [=]() {
+    connect(m_complement_btn, &QPushButton::clicked, this, [=]() {
         execute_unary_operation(m_main_view, &FiniteAutomaton::complement);
     });
+}
 
-    connect(union_btn, &QPushButton::clicked, this, [=]() {
+void OperationsDock::build_binary_group()
+{
+    m_union_btn = new QPushButton("Union");
+    m_intersection_btn = new QPushButton("Intersection");
+    m_difference_btn = new QPushButton("Difference");
+
+    auto binary_group =
+        create_operation_group("Binary", new QVBoxLayout, {m_union_btn, m_intersection_btn, m_difference_btn});
+    this->widget()->layout()->addWidget(binary_group);
+}
+
+void OperationsDock::setup_binary_group()
+{
+    connect(m_union_btn, &QPushButton::clicked, this, [=]() {
         execute_binary_operation(m_main_view, &FiniteAutomaton::union_with);
     });
 
-    connect(intersection_btn, &QPushButton::clicked, this, [=]() {
+    connect(m_intersection_btn, &QPushButton::clicked, this, [=]() {
         execute_binary_operation(m_main_view, &FiniteAutomaton::intersection_with);
     });
 
-    connect(difference_btn, &QPushButton::clicked, this, [=]() {
+    connect(m_difference_btn, &QPushButton::clicked, this, [=]() {
         execute_binary_operation(m_main_view, &FiniteAutomaton::difference_with);
     });
+}
 
-    connect(clone_btn, &QPushButton::clicked, this, [=]() { execute_clone(m_main_view); });
+void OperationsDock::build_general_group()
+{
+    m_clone_btn = new QPushButton("Clone");
+    m_delete_btn = new QPushButton("Delete");
 
-    connect(delete_btn, &QPushButton::clicked, this, [=]() { execute_delete(m_main_view); });
+    auto general_group = create_operation_group("General", new QVBoxLayout, {m_clone_btn, m_delete_btn});
+    this->widget()->layout()->addWidget(general_group);
+}
+
+void OperationsDock::setup_general_group()
+{
+    connect(m_clone_btn, &QPushButton::clicked, this, [=]() { execute_clone(m_main_view); });
+
+    connect(m_delete_btn, &QPushButton::clicked, this, [=]() { execute_delete(m_main_view); });
 }
