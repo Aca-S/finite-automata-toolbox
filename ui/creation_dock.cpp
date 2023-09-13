@@ -18,8 +18,10 @@ using namespace Ui::Utility;
 CreationDock::CreationDock(QGraphicsView *main_view, QWidget *parent) : QDockWidget(parent), m_main_view(main_view)
 {
     this->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
+    this->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
     auto dock_container = new QWidget;
+    dock_container->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     this->setWidget(dock_container);
     auto main_layout = new QVBoxLayout(dock_container);
 
