@@ -6,12 +6,7 @@
 
 Edge::Edge(const QString &label, const QFont &label_font) : m_label(label), m_label_font(label_font) {}
 
-QRectF Edge::boundingRect() const
-{
-    QRectF label_br =
-        QFontMetrics(m_label_font).boundingRect(m_label).translated(m_label_position.x(), m_label_position.y());
-    return m_path.boundingRect() | label_br;
-}
+QRectF Edge::boundingRect() const { return m_bounding_rectangle; }
 
 void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
@@ -60,4 +55,8 @@ void Edge::update_positions()
         QPointF label_dim = gv_to_qt_coords(ED_label(m_gv_edge)->dimen);
         m_label_position = {center_position.x() - label_dim.x() / 2.0, center_position.y()};
     }
+
+    QRectF label_br =
+        QFontMetrics(m_label_font).boundingRect(m_label).translated(m_label_position.x(), m_label_position.y());
+    m_bounding_rectangle = m_path.boundingRect() | label_br;
 }

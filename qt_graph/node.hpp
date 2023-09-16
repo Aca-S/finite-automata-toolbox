@@ -26,6 +26,7 @@ class Node : public QGraphicsItem
 
     QPainterPath m_path;
     QPointF m_label_position;
+    QRectF m_bounding_rectangle;
 
     Agnode_t *m_gv_node;
 };

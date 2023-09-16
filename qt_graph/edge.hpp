@@ -24,6 +24,7 @@ class Edge : public QGraphicsItem
 
     QPainterPath m_path;
     QPointF m_label_position;
+    QRectF m_bounding_rectangle;
 
     Agedge_t *m_gv_edge;
 };

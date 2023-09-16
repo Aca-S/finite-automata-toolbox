@@ -10,12 +10,7 @@ Node::Node(qreal width, qreal height, const QString &label, const QFont &label_f
 {
 }
 
-QRectF Node::boundingRect() const
-{
-    QRectF label_br =
-        QFontMetrics(m_label_font).boundingRect(m_label).translated(m_label_position.x(), m_label_position.y());
-    return m_path.boundingRect() | label_br;
-}
+QRectF Node::boundingRect() const { return m_bounding_rectangle; }
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
@@ -51,4 +46,8 @@ void Node::update_positions()
 
     if (m_label != "")
         m_label_position = m_path.boundingRect().center() - gv_to_qt_coords(ND_label(m_gv_node)->dimen) / 2.0;
+
+    QRectF label_br =
+        QFontMetrics(m_label_font).boundingRect(m_label).translated(m_label_position.x(), m_label_position.y());
+    m_bounding_rectangle = m_path.boundingRect() | label_br;
 }
