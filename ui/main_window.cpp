@@ -4,6 +4,7 @@
 #include <QWheelEvent>
 
 #include "creation_dock.hpp"
+#include "menu_bar.hpp"
 #include "operations_dock.hpp"
 #include "view_dock.hpp"
 
@@ -20,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->addDockWidget(Qt::LeftDockWidgetArea, new ViewDock(main_view, this));
     this->addDockWidget(Qt::LeftDockWidgetArea, new CreationDock(main_view, this));
     this->addDockWidget(Qt::RightDockWidgetArea, new OperationsDock(main_view, this));
+    this->setMenuBar(new MenuBar(this));
 }
 
 MainWindow::MainGraphicsView::MainGraphicsView(QWidget *parent) : QGraphicsView(parent)

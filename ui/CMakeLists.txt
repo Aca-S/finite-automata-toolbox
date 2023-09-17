@@ -7,6 +7,7 @@ qt_add_library(
     view_dock.cpp
     creation_dock.cpp
     operations_dock.cpp
+    menu_bar.cpp
     utility.cpp
 )
 
