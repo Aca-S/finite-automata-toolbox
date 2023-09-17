@@ -7,7 +7,7 @@ CircleNode::CircleNode(qreal size, const QString &label, const QFont &label_font
 {
 }
 
-QRectF CircleNode::boundingRect() const { return Node::boundingRect(); }
+QRectF CircleNode::boundingRect() const { return AutomatonNode::boundingRect(); }
 
 void CircleNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {

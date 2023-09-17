@@ -5,7 +5,7 @@
 
 // Used in representing automaton initial nodes by connecting an invisible
 // node to the initial node with a transition edge.
-class InvisibleNode : public Node
+class InvisibleNode : public QtGraph::Node
 {
   public:
     InvisibleNode();

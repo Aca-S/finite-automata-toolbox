@@ -1,5 +1,5 @@
-#ifndef GRAPH_HPP
-#define GRAPH_HPP
+#ifndef QT_GRAPH_GRAPH_HPP
+#define QT_GRAPH_GRAPH_HPP
 
 #include <QGraphicsItem>
 #include <graphviz/gvc.h>
@@ -7,6 +7,7 @@
 #include "edge.hpp"
 #include "node.hpp"
 
+namespace QtGraph {
 class Graph : public QGraphicsItem
 {
   public:
@@ -37,5 +38,6 @@ class Graph : public QGraphicsItem
     QVector<Edge *> m_edges;
     Agraph_t *m_gv_graph;
 };
+} // namespace QtGraph
 
-#endif // GRAPH_HPP
+#endif // QT_GRAPH_GRAPH_HPP

@@ -1,10 +1,11 @@
-#ifndef NODE_HPP
-#define NODE_HPP
+#ifndef QT_GRAPH_NODE_HPP
+#define QT_GRAPH_NODE_HPP
 
 #include <QFont>
 #include <QGraphicsItem>
 #include <graphviz/gvc.h>
 
+namespace QtGraph {
 class Node : public QGraphicsItem
 {
     friend class Graph;
@@ -30,5 +31,6 @@ class Node : public QGraphicsItem
 
     Agnode_t *m_gv_node;
 };
+} // namespace QtGraph
 
-#endif // NODE_HPP
+#endif // QT_GRAPH_NODE_HPP

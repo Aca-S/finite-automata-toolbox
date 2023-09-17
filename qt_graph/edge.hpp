@@ -1,10 +1,11 @@
-#ifndef EDGE_HPP
-#define EDGE_HPP
+#ifndef QT_GRAPH_EDGE_HPP
+#define QT_GRAPH_EDGE_HPP
 
 #include <QFont>
 #include <QGraphicsItem>
 #include <graphviz/gvc.h>
 
+namespace QtGraph {
 class Edge : public QGraphicsItem
 {
     friend class Graph;
@@ -28,5 +29,6 @@ class Edge : public QGraphicsItem
 
     Agedge_t *m_gv_edge;
 };
+} // namespace QtGraph
 
-#endif // EDGE_HPP
+#endif // QT_GRAPH_EDGE_HPP

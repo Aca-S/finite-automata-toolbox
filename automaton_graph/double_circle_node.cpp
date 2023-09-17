@@ -7,7 +7,7 @@ DoubleCircleNode::DoubleCircleNode(qreal outer_size, qreal inner_size, const QSt
 {
 }
 
-QRectF DoubleCircleNode::boundingRect() const { return Node::boundingRect(); }
+QRectF DoubleCircleNode::boundingRect() const { return AutomatonNode::boundingRect(); }
 
 void DoubleCircleNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {

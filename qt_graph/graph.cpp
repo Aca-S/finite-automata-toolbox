@@ -4,6 +4,8 @@
 
 #include "utility.hpp"
 
+using namespace QtGraph;
+
 Graph::Context::Context() : m_gv_context(gvContext()) {}
 
 Graph::Context::~Context() { gvFreeContext(m_gv_context); }

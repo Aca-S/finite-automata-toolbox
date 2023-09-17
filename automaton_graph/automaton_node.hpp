@@ -3,7 +3,7 @@
 
 #include "node.hpp"
 
-class AutomatonNode : public Node
+class AutomatonNode : public QtGraph::Node
 {
   public:
     AutomatonNode(qreal size, const QString &label, const QFont &label_font = QFont("Times-Roman", 12));

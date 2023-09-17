@@ -10,7 +10,7 @@
 #include <set>
 
 // Graphical representation of a finite automaton.
-class AutomatonGraph : public QObject, public Graph
+class AutomatonGraph : public QObject, public QtGraph::Graph
 {
     Q_OBJECT
 

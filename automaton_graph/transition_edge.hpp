@@ -4,7 +4,7 @@
 #include "edge.hpp"
 
 // Graphical representation of an automaton transition.
-class TransitionEdge : public Edge
+class TransitionEdge : public QtGraph::Edge
 {
   public:
     TransitionEdge(const QString &label, const QFont &label_font = QFont("Times-Roman", 12));

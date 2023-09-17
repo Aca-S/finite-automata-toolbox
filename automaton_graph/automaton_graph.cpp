@@ -7,8 +7,10 @@
 #include "invisible_node.hpp"
 #include "transition_edge.hpp"
 
-AutomatonGraph::AutomatonGraph(const FiniteAutomaton &automaton) : Graph(), m_automaton(automaton)
+AutomatonGraph::AutomatonGraph(const FiniteAutomaton &automaton) : QtGraph::Graph(), m_automaton(automaton)
 {
+    using namespace QtGraph;
+
     qreal node_size = 50;
 
     for (const auto &state : m_automaton.get_states()) {

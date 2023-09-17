@@ -4,6 +4,8 @@
 
 #include "utility.hpp"
 
+using namespace QtGraph;
+
 Edge::Edge(const QString &label, const QFont &label_font) : m_label(label), m_label_font(label_font) {}
 
 QRectF Edge::boundingRect() const { return m_bounding_rectangle; }
@@ -24,7 +26,7 @@ void Edge::setup()
 
 void Edge::update_positions()
 {
-    using namespace Utility;
+    using namespace QtGraph::Utility;
 
     m_path.clear();
 

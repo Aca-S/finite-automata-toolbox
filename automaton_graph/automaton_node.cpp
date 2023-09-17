@@ -3,11 +3,11 @@
 #include <QPainter>
 
 AutomatonNode::AutomatonNode(qreal size, const QString &label, const QFont &label_font)
-    : Node(size, size, label, label_font)
+    : QtGraph::Node(size, size, label, label_font)
 {
 }
 
-QRectF AutomatonNode::boundingRect() const { return Node::boundingRect(); }
+QRectF AutomatonNode::boundingRect() const { return QtGraph::Node::boundingRect(); }
 
 void AutomatonNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {

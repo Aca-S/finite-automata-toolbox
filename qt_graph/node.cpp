@@ -5,6 +5,8 @@
 
 #include "utility.hpp"
 
+using namespace QtGraph;
+
 Node::Node(qreal width, qreal height, const QString &label, const QFont &label_font)
     : m_width(width), m_height(height), m_label(label), m_label_font(label_font)
 {
@@ -31,7 +33,7 @@ void Node::setup()
 
 void Node::update_positions()
 {
-    using namespace Utility;
+    using namespace QtGraph::Utility;
 
     m_path.clear();
 
