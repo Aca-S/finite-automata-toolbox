@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->setWindowTitle("Finite Automata Toolbox");
 
     MainGraphicsView *main_view = new MainGraphicsView;
-    main_view->setScene(new QGraphicsScene);
+    main_view->setScene(new QGraphicsScene(main_view));
     this->setCentralWidget(main_view);
 
     this->addDockWidget(Qt::LeftDockWidgetArea, new ViewDock(main_view, this));

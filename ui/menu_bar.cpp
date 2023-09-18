@@ -3,8 +3,8 @@
 
 #include <QDataStream>
 #include <QFile>
-
-#include <iostream>
+#include <QFileDialog>
+#include <QMessageBox>
 
 #include "automaton_graph.hpp"
 #include "finite_automaton.hpp"
@@ -91,4 +91,22 @@ QGraphicsScene *deserialize_scene(QDataStream &in)
 }
 } // namespace
 
-void MenuBar::setup_file_menu() {}
+void MenuBar::setup_file_menu()
+{
+    connect(m_save_action, &QAction::triggered, this, [=]() {
+        QString file_name =
+            QFileDialog::getSaveFileName(this, "Save File", "", "Finite Automata Toolbox File (*.fat);;All Files (*)");
+        if (file_name.isEmpty())
+            return;
+        else {
+            QFile file(file_name);
+            if (!file.open(QIODevice::WriteOnly)) {
+                QMessageBox::information(this, "Unable to open file", file.errorString());
+                return;
+            }
+            QDataStream out(&file);
+            serialize_scene(out, m_main_view->scene());
+            file.close();
+        }
+    });
+}
