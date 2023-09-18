@@ -64,11 +64,31 @@ FiniteAutomaton deserialize_automaton(QDataStream &in)
 
     return *FiniteAutomaton::construct(alphabet, states, initial_states, final_states, transition_function);
 }
+
+void serialize_scene(QDataStream &out, QGraphicsScene *scene)
+{
+    auto graphs = get_items<AutomatonGraph>(scene);
+    out << graphs.size();
+    for (auto *graph : graphs) {
+        serialize_automaton(out, graph->get_automaton());
+        out << get_center_pos(graph);
+    }
+}
+
+QGraphicsScene *deserialize_scene(QDataStream &in)
+{
+    QGraphicsScene *scene = new QGraphicsScene;
+    qsizetype num_of_automata;
+    in >> num_of_automata;
+    for (qsizetype i = 0; i < num_of_automata; ++i) {
+        auto graph = new AutomatonGraph(deserialize_automaton(in));
+        QPointF pos;
+        in >> pos;
+        add_item_at_pos(graph, scene, pos);
+    }
+
+    return scene;
+}
 } // namespace
 
-void MenuBar::setup_file_menu()
-{
-    connect(m_save_action, &QAction::triggered, this, [=]() {
-
-    });
-}
+void MenuBar::setup_file_menu() {}
