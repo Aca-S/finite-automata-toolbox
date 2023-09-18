@@ -114,4 +114,25 @@ void MenuBar::setup_file_menu()
             file.close();
         }
     });
+
+    connect(m_open_action, &QAction::triggered, this, [=]() {
+        QString file_name =
+            QFileDialog::getOpenFileName(this, "Open File", "", "Finite Automata Toolbox File (*.fat);;All Files (*)");
+        if (file_name.isEmpty())
+            return;
+        else {
+            QFile file(file_name);
+            if (!file.open(QIODevice::ReadOnly)) {
+                QMessageBox::information(this, "Unable to open file", file.errorString());
+                return;
+            }
+            QDataStream in(&file);
+            auto *scene = deserialize_scene(in);
+            file.close();
+
+            delete m_main_view->scene();
+            scene->setParent(m_main_view);
+            m_main_view->setScene(scene);
+        }
+    });
 }
