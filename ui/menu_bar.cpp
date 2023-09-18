@@ -93,6 +93,11 @@ QGraphicsScene *deserialize_scene(QDataStream &in)
 
 void MenuBar::setup_file_menu()
 {
+    connect(m_new_action, &QAction::triggered, this, [=]() {
+        delete m_main_view->scene();
+        m_main_view->setScene(new QGraphicsScene(m_main_view));
+    });
+
     connect(m_save_action, &QAction::triggered, this, [=]() {
         QString file_name =
             QFileDialog::getSaveFileName(this, "Save File", "", "Finite Automata Toolbox File (*.fat);;All Files (*)");
