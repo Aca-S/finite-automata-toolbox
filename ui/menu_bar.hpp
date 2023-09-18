@@ -19,9 +19,7 @@ class MenuBar : public QMenuBar
     QMenu *m_file_menu;
     QAction *m_new_action;
     QAction *m_open_action;
-    QAction *m_save_action;
     QAction *m_save_as_action;
-    QAction *m_close_action;
 
     QGraphicsView *m_main_view;
 };

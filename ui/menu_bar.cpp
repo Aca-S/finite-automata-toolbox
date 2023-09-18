@@ -23,9 +23,7 @@ void MenuBar::build_file_menu()
     m_file_menu = this->addMenu("File");
     m_new_action = m_file_menu->addAction("New");
     m_open_action = m_file_menu->addAction("Open");
-    m_save_action = m_file_menu->addAction("Save");
     m_save_as_action = m_file_menu->addAction("Save As");
-    m_close_action = m_file_menu->addAction("Close");
 }
 
 namespace {
@@ -96,9 +94,10 @@ void MenuBar::setup_file_menu()
     connect(m_new_action, &QAction::triggered, this, [=]() {
         delete m_main_view->scene();
         m_main_view->setScene(new QGraphicsScene(m_main_view));
+        m_main_view->centerOn(0, 0);
     });
 
-    connect(m_save_action, &QAction::triggered, this, [=]() {
+    connect(m_save_as_action, &QAction::triggered, this, [=]() {
         QString file_name =
             QFileDialog::getSaveFileName(this, "Save File", "", "Finite Automata Toolbox File (*.fat);;All Files (*)");
         if (file_name.isEmpty())
@@ -133,6 +132,7 @@ void MenuBar::setup_file_menu()
             delete m_main_view->scene();
             scene->setParent(m_main_view);
             m_main_view->setScene(scene);
+            m_main_view->centerOn(0, 0);
         }
     });
 }
