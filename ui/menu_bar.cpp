@@ -6,6 +6,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include <expected>
+
 #include "automaton_graph.hpp"
 #include "finite_automaton.hpp"
 
@@ -40,13 +42,15 @@ void serialize_automaton(QDataStream &out, const FiniteAutomaton &automaton)
     out << alphabet << states << initial_states << final_states << transition_function;
 }
 
-FiniteAutomaton deserialize_automaton(QDataStream &in)
+std::expected<FiniteAutomaton, QString> deserialize_automaton(QDataStream &in)
 {
     QSet<char> q_alphabet;
     QSet<unsigned> q_states, q_initial_states, q_final_states;
     QMap<QPair<unsigned, char>, QSet<unsigned>> q_transition_function;
 
     in >> q_alphabet >> q_states >> q_initial_states >> q_final_states >> q_transition_function;
+    if (in.status() != QDataStream::Ok)
+        return std::unexpected("File format error");
 
     std::set<char> alphabet(q_alphabet.begin(), q_alphabet.end());
     std::set<unsigned> states(q_states.begin(), q_states.end());
@@ -60,7 +64,11 @@ FiniteAutomaton deserialize_automaton(QDataStream &in)
             std::set<unsigned>(it.value().begin(), it.value().end());
     }
 
-    return *FiniteAutomaton::construct(alphabet, states, initial_states, final_states, transition_function);
+    auto automaton = FiniteAutomaton::construct(alphabet, states, initial_states, final_states, transition_function);
+    if (!automaton)
+        return std::unexpected(QString::fromUtf8(automaton.error().c_str()));
+
+    return *automaton;
 }
 
 void serialize_scene(QDataStream &out, QGraphicsScene *scene)
@@ -73,16 +81,20 @@ void serialize_scene(QDataStream &out, QGraphicsScene *scene)
     }
 }
 
-QGraphicsScene *deserialize_scene(QDataStream &in)
+std::expected<QGraphicsScene *, QString> deserialize_scene(QDataStream &in)
 {
     QGraphicsScene *scene = new QGraphicsScene;
     qsizetype num_of_automata;
     in >> num_of_automata;
     for (qsizetype i = 0; i < num_of_automata; ++i) {
-        auto graph = new AutomatonGraph(deserialize_automaton(in));
+        auto automaton = deserialize_automaton(in);
         QPointF pos;
         in >> pos;
-        add_item_at_pos(graph, scene, pos);
+        if (in.status() != QDataStream::Ok || !automaton) {
+            delete scene;
+            return std::unexpected("File format error");
+        }
+        add_item_at_pos(new AutomatonGraph(*automaton), scene, pos);
     }
 
     return scene;
@@ -126,12 +138,18 @@ void MenuBar::setup_file_menu()
                 return;
             }
             QDataStream in(&file);
-            auto *scene = deserialize_scene(in);
+            auto scene = deserialize_scene(in);
             file.close();
 
+            // In case the file could not be read due to an invalid format, report the
+            // error and return.
+            if (!scene) {
+                QMessageBox::information(this, "Unable to open file", scene.error());
+                return;
+            }
             delete m_main_view->scene();
-            scene->setParent(m_main_view);
-            m_main_view->setScene(scene);
+            scene.value()->setParent(m_main_view);
+            m_main_view->setScene(*scene);
             m_main_view->centerOn(0, 0);
         }
     });
