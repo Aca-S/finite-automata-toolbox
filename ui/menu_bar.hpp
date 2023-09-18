@@ -1,6 +1,7 @@
 #ifndef UI_MENU_BAR_HPP
 #define UI_MENU_BAR_HPP
 
+#include <QGraphicsView>
 #include <QMenuBar>
 
 namespace Ui {
@@ -9,7 +10,7 @@ class MenuBar : public QMenuBar
     Q_OBJECT
 
   public:
-    MenuBar(QWidget *parent = nullptr);
+    MenuBar(QGraphicsView *main_view, QWidget *parent = nullptr);
 
   private:
     void build_file_menu();
@@ -21,6 +22,8 @@ class MenuBar : public QMenuBar
     QAction *m_save_action;
     QAction *m_save_as_action;
     QAction *m_close_action;
+
+    QGraphicsView *m_main_view;
 };
 } // namespace Ui
 
