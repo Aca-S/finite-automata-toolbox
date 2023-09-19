@@ -9,6 +9,7 @@ qt_add_library(
     operations_dock.cpp
     menu_bar.cpp
     scene_tab_bar.cpp
+    automata_scene.cpp
     utility.cpp
 )
 
