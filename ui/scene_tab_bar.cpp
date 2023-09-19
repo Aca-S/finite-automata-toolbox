@@ -32,4 +32,16 @@ int SceneTabBar::add_scene_tab(AutomataScene *scene)
         return addTab(scene->get_scene_name());
 }
 
-void SceneTabBar::remove_scene_tab(int index) {}
+void SceneTabBar::remove_scene_tab(int index)
+{
+    removeTab(index);
+    m_automata_scenes.removeAt(index);
+
+    // We don't want to allow no tabs existing, so if
+    // the last one got removed, create a new one with
+    // a blank scene.
+    if (m_automata_scenes.isEmpty())
+        add_scene_tab();
+}
+
+void SceneTabBar::remove_scene_tab() { remove_scene_tab(currentIndex()); }

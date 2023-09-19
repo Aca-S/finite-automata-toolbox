@@ -26,6 +26,7 @@ class SceneTabBar : public QTabBar
 
     int add_scene_tab(AutomataScene *scene = nullptr);
     void remove_scene_tab(int index);
+    void remove_scene_tab();
 
   private:
     QList<AutomataScene *> m_automata_scenes;
