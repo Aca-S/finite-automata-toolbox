@@ -8,6 +8,7 @@
 
 #include <expected>
 
+#include "automata_scene.hpp"
 #include "automaton_graph.hpp"
 #include "finite_automaton.hpp"
 
@@ -71,7 +72,7 @@ std::expected<FiniteAutomaton, QString> deserialize_automaton(QDataStream &in)
     return *automaton;
 }
 
-void serialize_scene(QDataStream &out, QGraphicsScene *scene)
+void serialize_scene(QDataStream &out, AutomataScene *scene)
 {
     auto graphs = get_items<AutomatonGraph>(scene);
     out << graphs.size();
@@ -81,9 +82,9 @@ void serialize_scene(QDataStream &out, QGraphicsScene *scene)
     }
 }
 
-std::expected<QGraphicsScene *, QString> deserialize_scene(QDataStream &in)
+std::expected<AutomataScene *, QString> deserialize_scene(QDataStream &in)
 {
-    QGraphicsScene *scene = new QGraphicsScene;
+    AutomataScene *scene = new AutomataScene;
     qsizetype num_of_automata;
     in >> num_of_automata;
     for (qsizetype i = 0; i < num_of_automata; ++i) {
@@ -103,15 +104,10 @@ std::expected<QGraphicsScene *, QString> deserialize_scene(QDataStream &in)
 
 void MenuBar::setup_file_menu()
 {
-    connect(m_new_action, &QAction::triggered, this, [=]() {
-        m_scene_tab_bar->add_scene_tab();
-        /*delete m_main_view->scene();
-        m_main_view->setScene(new QGraphicsScene(m_main_view));
-        m_main_view->centerOn(0, 0);*/
-    });
+    connect(m_new_action, &QAction::triggered, this, [=]() { m_scene_tab_bar->add_scene_tab(); });
 
     connect(m_save_as_action, &QAction::triggered, this, [=]() {
-        /*QString file_name =
+        QString file_name =
             QFileDialog::getSaveFileName(this, "Save File", "", "Finite Automata Toolbox File (*.fat);;All Files (*)");
         if (file_name.isEmpty())
             return;
@@ -122,13 +118,16 @@ void MenuBar::setup_file_menu()
                 return;
             }
             QDataStream out(&file);
-            serialize_scene(out, m_main_view->scene());
+            serialize_scene(out, m_scene_tab_bar->get_current_scene());
             file.close();
-        }*/
+
+            m_scene_tab_bar->get_current_scene()->set_scene_name(file_name);
+            m_scene_tab_bar->setTabText(m_scene_tab_bar->currentIndex(), file_name);
+        }
     });
 
     connect(m_open_action, &QAction::triggered, this, [=]() {
-        /*QString file_name =
+        QString file_name =
             QFileDialog::getOpenFileName(this, "Open File", "", "Finite Automata Toolbox File (*.fat);;All Files (*)");
         if (file_name.isEmpty())
             return;
@@ -148,10 +147,8 @@ void MenuBar::setup_file_menu()
                 QMessageBox::information(this, "Unable to open file", scene.error());
                 return;
             }
-            delete m_main_view->scene();
-            scene.value()->setParent(m_main_view);
-            m_main_view->setScene(*scene);
-            m_main_view->centerOn(0, 0);
-        }*/
+            scene.value()->set_scene_name(file_name);
+            m_scene_tab_bar->add_scene_tab(*scene);
+        }
     });
 }

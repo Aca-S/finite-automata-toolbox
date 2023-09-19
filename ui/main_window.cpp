@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->setWindowTitle("Finite Automata Toolbox");
 
     MainGraphicsView *main_view = new MainGraphicsView(this);
-    QTabBar *tab_bar = new SceneTabBar(main_view, this);
+    SceneTabBar *tab_bar = new SceneTabBar(main_view, this);
 
     QWidget *central_widget = new QWidget(this);
     QVBoxLayout *central_layout = new QVBoxLayout(central_widget);
@@ -26,10 +26,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     central_layout->setSpacing(0);
     this->setCentralWidget(central_widget);
 
+    this->setMenuBar(new MenuBar(tab_bar, this));
     this->addDockWidget(Qt::LeftDockWidgetArea, new ViewDock(main_view, this));
     this->addDockWidget(Qt::LeftDockWidgetArea, new CreationDock(main_view, this));
     this->addDockWidget(Qt::RightDockWidgetArea, new OperationsDock(main_view, this));
-    this->setMenuBar(new MenuBar(main_view, this));
 }
 
 MainWindow::MainGraphicsView::MainGraphicsView(QWidget *parent) : QGraphicsView(parent)
