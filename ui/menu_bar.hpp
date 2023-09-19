@@ -1,8 +1,9 @@
 #ifndef UI_MENU_BAR_HPP
 #define UI_MENU_BAR_HPP
 
-#include <QGraphicsView>
 #include <QMenuBar>
+
+#include "scene_tab_bar.hpp"
 
 namespace Ui {
 class MenuBar : public QMenuBar
@@ -10,7 +11,7 @@ class MenuBar : public QMenuBar
     Q_OBJECT
 
   public:
-    MenuBar(QGraphicsView *main_view, QWidget *parent = nullptr);
+    MenuBar(SceneTabBar *scene_tab_bar, QWidget *parent = nullptr);
 
   private:
     void build_file_menu();
@@ -21,7 +22,7 @@ class MenuBar : public QMenuBar
     QAction *m_open_action;
     QAction *m_save_as_action;
 
-    QGraphicsView *m_main_view;
+    SceneTabBar *m_scene_tab_bar;
 };
 } // namespace Ui
 

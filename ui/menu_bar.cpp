@@ -14,7 +14,7 @@
 using namespace Ui;
 using namespace Ui::Utility;
 
-MenuBar::MenuBar(QGraphicsView *main_view, QWidget *parent) : QMenuBar(parent), m_main_view(main_view)
+MenuBar::MenuBar(SceneTabBar *scene_tab_bar, QWidget *parent) : QMenuBar(parent), m_scene_tab_bar(scene_tab_bar)
 {
     build_file_menu();
     setup_file_menu();
@@ -104,13 +104,14 @@ std::expected<QGraphicsScene *, QString> deserialize_scene(QDataStream &in)
 void MenuBar::setup_file_menu()
 {
     connect(m_new_action, &QAction::triggered, this, [=]() {
-        delete m_main_view->scene();
+        m_scene_tab_bar->add_scene_tab();
+        /*delete m_main_view->scene();
         m_main_view->setScene(new QGraphicsScene(m_main_view));
-        m_main_view->centerOn(0, 0);
+        m_main_view->centerOn(0, 0);*/
     });
 
     connect(m_save_as_action, &QAction::triggered, this, [=]() {
-        QString file_name =
+        /*QString file_name =
             QFileDialog::getSaveFileName(this, "Save File", "", "Finite Automata Toolbox File (*.fat);;All Files (*)");
         if (file_name.isEmpty())
             return;
@@ -123,11 +124,11 @@ void MenuBar::setup_file_menu()
             QDataStream out(&file);
             serialize_scene(out, m_main_view->scene());
             file.close();
-        }
+        }*/
     });
 
     connect(m_open_action, &QAction::triggered, this, [=]() {
-        QString file_name =
+        /*QString file_name =
             QFileDialog::getOpenFileName(this, "Open File", "", "Finite Automata Toolbox File (*.fat);;All Files (*)");
         if (file_name.isEmpty())
             return;
@@ -151,6 +152,6 @@ void MenuBar::setup_file_menu()
             scene.value()->setParent(m_main_view);
             m_main_view->setScene(*scene);
             m_main_view->centerOn(0, 0);
-        }
+        }*/
     });
 }
