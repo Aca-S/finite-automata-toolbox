@@ -27,6 +27,7 @@ void MenuBar::build_file_menu()
     m_new_action = m_file_menu->addAction("New");
     m_open_action = m_file_menu->addAction("Open");
     m_save_as_action = m_file_menu->addAction("Save As");
+    m_close_action = m_file_menu->addAction("Close");
 }
 
 namespace {
@@ -151,4 +152,6 @@ void MenuBar::setup_file_menu()
             m_scene_tab_bar->add_scene_tab(*scene);
         }
     });
+
+    connect(m_close_action, &QAction::triggered, this, [=]() { m_scene_tab_bar->remove_scene_tab(); });
 }

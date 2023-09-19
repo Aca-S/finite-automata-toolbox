@@ -39,15 +39,17 @@ int SceneTabBar::add_scene_tab(AutomataScene *scene)
 
 void SceneTabBar::remove_scene_tab(int index)
 {
-    removeTab(index);
-    delete m_automata_scenes.at(index);
-    m_automata_scenes.removeAt(index);
-
     // We don't want to allow no tabs existing, so if
     // the last one got removed, create a new one with
-    // a blank scene.
-    if (m_automata_scenes.isEmpty())
+    // a blank scene. NOTE: Qt fails an assert upon
+    // removing the last tab, so this check has to come
+    // before the removal.
+    if (m_automata_scenes.size() == 1)
         add_scene_tab();
+
+    delete m_automata_scenes.at(index);
+    m_automata_scenes.removeAt(index);
+    removeTab(index);
 }
 
 void SceneTabBar::remove_scene_tab() { remove_scene_tab(currentIndex()); }

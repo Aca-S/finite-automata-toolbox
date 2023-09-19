@@ -21,6 +21,7 @@ class MenuBar : public QMenuBar
     QAction *m_new_action;
     QAction *m_open_action;
     QAction *m_save_as_action;
+    QAction *m_close_action;
 
     SceneTabBar *m_scene_tab_bar;
 };
