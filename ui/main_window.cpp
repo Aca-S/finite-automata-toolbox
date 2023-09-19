@@ -1,11 +1,13 @@
 #include "main_window.hpp"
 
 #include <QKeyEvent>
+#include <QLayout>
 #include <QWheelEvent>
 
 #include "creation_dock.hpp"
 #include "menu_bar.hpp"
 #include "operations_dock.hpp"
+#include "scene_tab_bar.hpp"
 #include "view_dock.hpp"
 
 using namespace Ui;
@@ -16,7 +18,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     MainGraphicsView *main_view = new MainGraphicsView;
     main_view->setScene(new QGraphicsScene(main_view));
-    this->setCentralWidget(main_view);
+
+    QTabBar *tab_bar = new SceneTabBar(main_view, this);
+
+    QWidget *central_widget = new QWidget;
+    QVBoxLayout *central_layout = new QVBoxLayout(central_widget);
+    central_layout->addWidget(tab_bar);
+    central_layout->addWidget(main_view);
+    central_layout->setSpacing(0);
+    this->setCentralWidget(central_widget);
 
     this->addDockWidget(Qt::LeftDockWidgetArea, new ViewDock(main_view, this));
     this->addDockWidget(Qt::LeftDockWidgetArea, new CreationDock(main_view, this));

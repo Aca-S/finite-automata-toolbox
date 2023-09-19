@@ -8,6 +8,7 @@ qt_add_library(
     creation_dock.cpp
     operations_dock.cpp
     menu_bar.cpp
+    scene_tab_bar.cpp
     utility.cpp
 )
 
