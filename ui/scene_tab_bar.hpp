@@ -4,15 +4,6 @@
 #include <QGraphicsView>
 #include <QTabBar>
 
-class SceneTabBar : public QTabBar
-{
-  public:
-    SceneTabBar(QGraphicsView *main_view, QWidget *parent = nullptr);
-
-  private:
-    QGraphicsView *m_main_view;
-};
-
 class AutomataScene : public QGraphicsScene
 {
   public:
@@ -26,6 +17,20 @@ class AutomataScene : public QGraphicsScene
   private:
     QString m_scene_name;
     bool m_has_unsaved_changes = false;
+};
+
+class SceneTabBar : public QTabBar
+{
+  public:
+    SceneTabBar(QGraphicsView *main_view, QWidget *parent = nullptr);
+
+    int add_scene_tab(AutomataScene *scene = nullptr);
+    void remove_scene_tab(int index);
+
+  private:
+    QList<AutomataScene *> m_automata_scenes;
+
+    QGraphicsView *m_main_view;
 };
 
 #endif // UI_SCENE_TAB_BAR_HPP

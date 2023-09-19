@@ -16,12 +16,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     this->setWindowTitle("Finite Automata Toolbox");
 
-    MainGraphicsView *main_view = new MainGraphicsView;
-    main_view->setScene(new QGraphicsScene(main_view));
-
+    MainGraphicsView *main_view = new MainGraphicsView(this);
     QTabBar *tab_bar = new SceneTabBar(main_view, this);
 
-    QWidget *central_widget = new QWidget;
+    QWidget *central_widget = new QWidget(this);
     QVBoxLayout *central_layout = new QVBoxLayout(central_widget);
     central_layout->addWidget(tab_bar);
     central_layout->addWidget(main_view);
