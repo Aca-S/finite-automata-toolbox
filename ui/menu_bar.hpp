@@ -16,10 +16,14 @@ class MenuBar : public QMenuBar
   private:
     void build_file_menu();
     void setup_file_menu();
+    void save_file(const QString &file_name);
+    void save_with_dialog();
+    void open_with_dialog();
 
     QMenu *m_file_menu;
     QAction *m_new_action;
     QAction *m_open_action;
+    QAction *m_save_action;
     QAction *m_save_as_action;
     QAction *m_close_action;
 

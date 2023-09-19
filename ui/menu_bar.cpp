@@ -26,8 +26,28 @@ void MenuBar::build_file_menu()
     m_file_menu = this->addMenu("File");
     m_new_action = m_file_menu->addAction("New");
     m_open_action = m_file_menu->addAction("Open");
+    m_save_action = m_file_menu->addAction("Save");
     m_save_as_action = m_file_menu->addAction("Save As");
     m_close_action = m_file_menu->addAction("Close");
+}
+
+void MenuBar::setup_file_menu()
+{
+    connect(m_new_action, &QAction::triggered, this, [=]() { m_scene_tab_bar->add_scene_tab(); });
+
+    connect(m_open_action, &QAction::triggered, this, [=]() { open_with_dialog(); });
+
+    connect(m_save_action, &QAction::triggered, this, [=]() {
+        auto scene_name = m_scene_tab_bar->get_current_scene()->get_scene_name();
+        if (scene_name.isEmpty())
+            save_with_dialog();
+        else
+            save_file(scene_name);
+    });
+
+    connect(m_save_as_action, &QAction::triggered, this, [=]() { save_with_dialog(); });
+
+    connect(m_close_action, &QAction::triggered, this, [=]() { m_scene_tab_bar->remove_scene_tab(); });
 }
 
 namespace {
@@ -103,55 +123,54 @@ std::expected<AutomataScene *, QString> deserialize_scene(QDataStream &in)
 }
 } // namespace
 
-void MenuBar::setup_file_menu()
+void MenuBar::save_file(const QString &file_name)
 {
-    connect(m_new_action, &QAction::triggered, this, [=]() { m_scene_tab_bar->add_scene_tab(); });
+    QFile file(file_name);
+    if (!file.open(QIODevice::WriteOnly)) {
+        QMessageBox::information(this, "Unable to open file", file.errorString());
+        return;
+    }
+    QDataStream out(&file);
+    serialize_scene(out, m_scene_tab_bar->get_current_scene());
+    file.close();
+}
 
-    connect(m_save_as_action, &QAction::triggered, this, [=]() {
-        QString file_name =
-            QFileDialog::getSaveFileName(this, "Save File", "", "Finite Automata Toolbox File (*.fat);;All Files (*)");
-        if (file_name.isEmpty())
+void MenuBar::save_with_dialog()
+{
+    QString file_name =
+        QFileDialog::getSaveFileName(this, "Save File", "", "Finite Automata Toolbox File (*.fat);;All Files (*)");
+    if (file_name.isEmpty())
+        return;
+    else {
+        save_file(file_name);
+        m_scene_tab_bar->get_current_scene()->set_scene_name(file_name);
+        m_scene_tab_bar->setTabText(m_scene_tab_bar->currentIndex(), file_name);
+    }
+}
+
+void MenuBar::open_with_dialog()
+{
+    QString file_name =
+        QFileDialog::getOpenFileName(this, "Open File", "", "Finite Automata Toolbox File (*.fat);;All Files (*)");
+    if (file_name.isEmpty())
+        return;
+    else {
+        QFile file(file_name);
+        if (!file.open(QIODevice::ReadOnly)) {
+            QMessageBox::information(this, "Unable to open file", file.errorString());
             return;
-        else {
-            QFile file(file_name);
-            if (!file.open(QIODevice::WriteOnly)) {
-                QMessageBox::information(this, "Unable to open file", file.errorString());
-                return;
-            }
-            QDataStream out(&file);
-            serialize_scene(out, m_scene_tab_bar->get_current_scene());
-            file.close();
-
-            m_scene_tab_bar->get_current_scene()->set_scene_name(file_name);
-            m_scene_tab_bar->setTabText(m_scene_tab_bar->currentIndex(), file_name);
         }
-    });
+        QDataStream in(&file);
+        auto scene = deserialize_scene(in);
+        file.close();
 
-    connect(m_open_action, &QAction::triggered, this, [=]() {
-        QString file_name =
-            QFileDialog::getOpenFileName(this, "Open File", "", "Finite Automata Toolbox File (*.fat);;All Files (*)");
-        if (file_name.isEmpty())
+        // In case the file could not be read due to an invalid format, report the
+        // error and return.
+        if (!scene) {
+            QMessageBox::information(this, "Unable to open file", scene.error());
             return;
-        else {
-            QFile file(file_name);
-            if (!file.open(QIODevice::ReadOnly)) {
-                QMessageBox::information(this, "Unable to open file", file.errorString());
-                return;
-            }
-            QDataStream in(&file);
-            auto scene = deserialize_scene(in);
-            file.close();
-
-            // In case the file could not be read due to an invalid format, report the
-            // error and return.
-            if (!scene) {
-                QMessageBox::information(this, "Unable to open file", scene.error());
-                return;
-            }
-            scene.value()->set_scene_name(file_name);
-            m_scene_tab_bar->add_scene_tab(*scene);
         }
-    });
-
-    connect(m_close_action, &QAction::triggered, this, [=]() { m_scene_tab_bar->remove_scene_tab(); });
+        scene.value()->set_scene_name(file_name);
+        m_scene_tab_bar->add_scene_tab(*scene);
+    }
 }
