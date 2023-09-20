@@ -27,6 +27,10 @@ class MenuBar : public QMenuBar
     QAction *m_save_as_action;
     QAction *m_close_action;
 
+    QMenu *m_edit_menu;
+    QAction *m_undo_action;
+    QAction *m_redo_action;
+
     SceneTabBar *m_scene_tab_bar;
 };
 } // namespace Ui

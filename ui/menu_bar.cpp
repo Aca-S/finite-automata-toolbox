@@ -25,6 +25,10 @@ void MenuBar::build_file_menu()
     m_save_action = m_file_menu->addAction("Save");
     m_save_as_action = m_file_menu->addAction("Save As");
     m_close_action = m_file_menu->addAction("Close");
+
+    m_edit_menu = this->addMenu("Edit");
+    m_undo_action = m_edit_menu->addAction("Undo");
+    m_redo_action = m_edit_menu->addAction("Redo");
 }
 
 void MenuBar::setup_file_menu()
