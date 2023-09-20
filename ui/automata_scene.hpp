@@ -3,20 +3,22 @@
 
 #include <QGraphicsScene>
 
+#include <expected>
+#include <optional>
+
 namespace Ui {
 class AutomataScene : public QGraphicsScene
 {
   public:
     AutomataScene(QWidget *parent = nullptr);
 
-    void set_scene_name(const QString &scene_name);
-    QString get_scene_name();
+    static std::expected<AutomataScene *, QString> load_from_file(const QString &file_name, QWidget *parent = nullptr);
+    std::optional<QString> save_to_file(const QString &file_name);
 
-    bool has_unsaved_changes();
+    QString get_name() const;
 
   private:
-    QString m_scene_name;
-    bool m_has_unsaved_changes = false;
+    QString m_name;
 };
 } // namespace Ui
 

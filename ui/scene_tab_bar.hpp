@@ -13,10 +13,15 @@ class SceneTabBar : public QTabBar
     SceneTabBar(QGraphicsView *main_view, QWidget *parent = nullptr);
 
     int add_scene_tab(AutomataScene *scene = nullptr);
+
     void remove_scene_tab(int index);
     void remove_scene_tab();
 
-    AutomataScene *get_current_scene();
+    AutomataScene *get_scene(int index);
+    AutomataScene *get_scene();
+
+    void update_scene_tab_name(int index);
+    void update_scene_tab_name();
 
   private:
     QList<AutomataScene *> m_automata_scenes;

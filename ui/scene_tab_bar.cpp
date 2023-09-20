@@ -26,11 +26,8 @@ int SceneTabBar::add_scene_tab(AutomataScene *scene)
     m_main_view->setScene(scene);
     m_main_view->centerOn(0, 0);
 
-    int tab_index;
-    if (scene->get_scene_name().isEmpty())
-        tab_index = addTab("Untitled");
-    else
-        tab_index = addTab(scene->get_scene_name());
+    auto scene_name = scene->get_name();
+    int tab_index = scene_name.isEmpty() ? addTab("Untitled") : addTab(scene_name);
 
     setCurrentIndex(tab_index);
 
@@ -41,9 +38,9 @@ void SceneTabBar::remove_scene_tab(int index)
 {
     // We don't want to allow no tabs existing, so if
     // the last one got removed, create a new one with
-    // a blank scene. NOTE: Qt fails an assert upon
-    // removing the last tab, so this check has to come
-    // before the removal.
+    // a blank scene.
+    // NOTE: Qt fails an assert upon removing the last tab,
+    // so this check has to come before the removal.
     if (m_automata_scenes.size() == 1)
         add_scene_tab();
 
@@ -54,4 +51,14 @@ void SceneTabBar::remove_scene_tab(int index)
 
 void SceneTabBar::remove_scene_tab() { remove_scene_tab(currentIndex()); }
 
-AutomataScene *SceneTabBar::get_current_scene() { return m_automata_scenes.at(currentIndex()); }
+AutomataScene *SceneTabBar::get_scene(int index) { return m_automata_scenes.at(index); }
+
+AutomataScene *SceneTabBar::get_scene() { return get_scene(currentIndex()); }
+
+void SceneTabBar::update_scene_tab_name(int index)
+{
+    auto scene_name = m_automata_scenes.at(index)->get_name();
+    scene_name.isEmpty() ? setTabText(index, "Untitled") : setTabText(index, scene_name);
+}
+
+void SceneTabBar::update_scene_tab_name() { return update_scene_tab_name(currentIndex()); }
