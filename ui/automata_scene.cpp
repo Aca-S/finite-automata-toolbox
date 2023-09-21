@@ -122,3 +122,26 @@ std::optional<QString> AutomataScene::save_to_file(const QString &file_name)
 
     return std::nullopt;
 }
+
+void AutomataScene::add_automata(const QList<QPair<QGraphicsItem *, QPointF>> &items)
+{
+    m_undo_stack->push(new AddCommand(this, items));
+}
+
+AutomataScene::AddCommand::AddCommand(
+    QGraphicsScene *scene, const QList<QPair<QGraphicsItem *, QPointF>> &items, QUndoCommand *parent)
+    : m_scene(scene), m_items(items)
+{
+}
+
+void AutomataScene::AddCommand::undo()
+{
+    for (auto &[item, pos] : m_items)
+        m_scene->removeItem(item);
+}
+
+void AutomataScene::AddCommand::redo()
+{
+    for (auto &[item, pos] : m_items)
+        Utility::add_item_at_pos(item, m_scene, pos);
+}
