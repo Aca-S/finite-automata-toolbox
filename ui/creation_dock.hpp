@@ -14,7 +14,7 @@ class CreationDock : public QDockWidget
     Q_OBJECT
 
   public:
-    CreationDock(QGraphicsView *main_view, QWidget *parent = nullptr);
+    CreationDock(QWidget *parent = nullptr);
 
   private:
     void build_element_group();
@@ -34,7 +34,8 @@ class CreationDock : public QDockWidget
     QPushButton *m_regex_construct_btn;
     QLabel *m_regex_construct_info;
 
-    QGraphicsView *m_main_view;
+  signals:
+    void operation_triggered(const std::function<void(QGraphicsView *view)> &op);
 };
 } // namespace Ui
 

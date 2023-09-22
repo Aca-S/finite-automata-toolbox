@@ -15,7 +15,7 @@
 using namespace Ui;
 using namespace Ui::Utility;
 
-CreationDock::CreationDock(QGraphicsView *main_view, QWidget *parent) : QDockWidget(parent), m_main_view(main_view)
+CreationDock::CreationDock(QWidget *parent) : QDockWidget(parent)
 {
     this->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     this->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -164,8 +164,11 @@ void CreationDock::construct_by_element()
 
     auto automaton = FiniteAutomaton::construct(alphabet, states, initial_states, final_states, transition_function);
     if (automaton) {
-        auto graph = new AutomatonGraph(*automaton);
-        add_item_at_pos(graph, m_main_view->scene(), get_viewport_center_pos(m_main_view));
+        auto op = [automaton](QGraphicsView *view) {
+            auto graph = new AutomatonGraph(*automaton);
+            add_item_at_pos(graph, view->scene(), get_viewport_center_pos(view));
+        };
+        emit operation_triggered(op);
     } else
         m_element_construct_info->setText(QString::fromUtf8(automaton.error().c_str()));
 }
@@ -202,8 +205,11 @@ void CreationDock::construct_by_regex()
     std::string regex(m_regex_le->text().toUtf8().constData());
     auto automaton = FiniteAutomaton::construct(regex);
     if (automaton) {
-        auto graph = new AutomatonGraph(*automaton);
-        add_item_at_pos(graph, m_main_view->scene(), get_viewport_center_pos(m_main_view));
+        auto op = [automaton](QGraphicsView *view) {
+            auto graph = new AutomatonGraph(*automaton);
+            add_item_at_pos(graph, view->scene(), get_viewport_center_pos(view));
+        };
+        emit operation_triggered(op);
     } else
         m_regex_construct_info->setText(QString::fromUtf8(automaton.error().c_str()));
 }
