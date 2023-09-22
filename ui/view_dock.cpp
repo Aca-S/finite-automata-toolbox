@@ -55,7 +55,7 @@ void execute_matcher_operation(
 }
 } // namespace
 
-ViewDock::ViewDock(QGraphicsView *main_view, QWidget *parent) : QDockWidget(parent), m_main_view(main_view)
+ViewDock::ViewDock(QWidget *parent) : QDockWidget(parent)
 {
     this->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     this->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -101,15 +101,18 @@ void ViewDock::setup_view_section()
         m_regex_le->clear();
         m_view_info->setText("");
 
-        auto graphs = get_selected<AutomatonGraph>(m_main_view->scene());
+        auto op = [=](QGraphicsView *view) {
+            auto graphs = get_selected<AutomatonGraph>(view->scene());
+            if (graphs.size() > 0) {
+                auto *new_graph = new AutomatonGraph(graphs.at(0)->get_automaton());
+                new_graph->setFlag(QGraphicsItem::ItemIsSelectable, false);
+                new_graph->setFlag(QGraphicsItem::ItemIsMovable, false);
+                add_item_at_pos(new_graph, m_side_view->scene(), get_viewport_center_pos(m_side_view));
+            } else
+                m_view_info->setText("An automaton must be selected from the main view.");
+        };
 
-        if (graphs.size() > 0) {
-            auto *new_graph = new AutomatonGraph(graphs.at(0)->get_automaton());
-            new_graph->setFlag(QGraphicsItem::ItemIsSelectable, false);
-            new_graph->setFlag(QGraphicsItem::ItemIsMovable, false);
-            add_item_at_pos(new_graph, m_side_view->scene(), get_viewport_center_pos(m_side_view));
-        } else
-            m_view_info->setText("An automaton must be selected from the main view.");
+        emit operation_triggered(op);
     });
 }
 

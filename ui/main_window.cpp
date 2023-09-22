@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     this->setMenuBar(new MenuBar(tab_bar, this));
 
-    auto view_dock = new ViewDock(main_view, this);
+    auto view_dock = new ViewDock(this);
     auto creation_dock = new CreationDock(this);
     auto operation_dock = new OperationsDock(this);
 
@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->addDockWidget(Qt::LeftDockWidgetArea, creation_dock);
     this->addDockWidget(Qt::RightDockWidgetArea, operation_dock);
 
+    connect(view_dock, &ViewDock::operation_triggered, main_view, &MainGraphicsView::execute_operation);
     connect(creation_dock, &CreationDock::operation_triggered, main_view, &MainGraphicsView::execute_operation);
     connect(operation_dock, &OperationsDock::operation_triggered, main_view, &MainGraphicsView::execute_operation);
 }

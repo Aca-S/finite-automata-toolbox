@@ -15,7 +15,7 @@ class ViewDock : public QDockWidget
     class SideGraphicsView;
 
   public:
-    ViewDock(QGraphicsView *main_view, QWidget *parent = nullptr);
+    ViewDock(QWidget *parent = nullptr);
 
   private:
     void build_view_section();
@@ -39,7 +39,8 @@ class ViewDock : public QDockWidget
 
     QLabel *m_view_info;
 
-    QGraphicsView *m_main_view;
+  signals:
+    void operation_triggered(const std::function<void(QGraphicsView *view)> &op);
 };
 
 class ViewDock::SideGraphicsView : public QGraphicsView
