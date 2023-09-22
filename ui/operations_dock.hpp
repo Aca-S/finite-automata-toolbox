@@ -5,13 +5,15 @@
 #include <QGraphicsView>
 #include <QPushButton>
 
+#include <functional>
+
 namespace Ui {
 class OperationsDock : public QDockWidget
 {
     Q_OBJECT
 
   public:
-    OperationsDock(QGraphicsView *main_view, QWidget *parent = nullptr);
+    OperationsDock(QWidget *parent = nullptr);
 
   private:
     void build_unary_group();
@@ -36,7 +38,8 @@ class OperationsDock : public QDockWidget
     QPushButton *m_clone_btn;
     QPushButton *m_delete_btn;
 
-    QGraphicsView *m_main_view;
+  signals:
+    void operation_triggered(const std::function<void(QGraphicsView *view)> &op);
 };
 } // namespace Ui
 

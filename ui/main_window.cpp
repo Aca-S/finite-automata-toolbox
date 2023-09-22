@@ -27,10 +27,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->setCentralWidget(central_widget);
 
     this->setMenuBar(new MenuBar(tab_bar, this));
-    this->addDockWidget(Qt::LeftDockWidgetArea, new ViewDock(main_view, this));
-    this->addDockWidget(Qt::LeftDockWidgetArea, new CreationDock(main_view, this));
-    this->addDockWidget(Qt::RightDockWidgetArea, new OperationsDock(main_view, this));
+
+    auto view_dock = new ViewDock(main_view, this);
+    auto creation_dock = new CreationDock(main_view, this);
+    auto operation_dock = new OperationsDock(this);
+
+    this->addDockWidget(Qt::LeftDockWidgetArea, view_dock);
+    this->addDockWidget(Qt::LeftDockWidgetArea, creation_dock);
+    this->addDockWidget(Qt::RightDockWidgetArea, operation_dock);
+
+    connect(operation_dock, &OperationsDock::operation_triggered, main_view, &MainGraphicsView::execute_operation);
 }
+
+void MainWindow::MainGraphicsView::execute_operation(const std::function<void(QGraphicsView *view)> &op) { op(this); }
 
 MainWindow::MainGraphicsView::MainGraphicsView(QWidget *parent) : QGraphicsView(parent)
 {

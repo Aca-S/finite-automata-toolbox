@@ -68,7 +68,7 @@ void execute_delete(QGraphicsView *view)
 }
 } // namespace
 
-OperationsDock::OperationsDock(QGraphicsView *main_view, QWidget *parent) : QDockWidget(parent), m_main_view(main_view)
+OperationsDock::OperationsDock(QWidget *parent) : QDockWidget(parent)
 {
     this->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     this->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -106,23 +106,28 @@ void OperationsDock::build_unary_group()
 void OperationsDock::setup_unary_group()
 {
     connect(m_determinize_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(m_main_view, &FiniteAutomaton::determinize);
+        auto op = [](QGraphicsView *view) { execute_unary_operation(view, &FiniteAutomaton::determinize); };
+        emit operation_triggered(op);
     });
 
     connect(m_minimize_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(m_main_view, &FiniteAutomaton::minimize);
+        auto op = [](QGraphicsView *view) { execute_unary_operation(view, &FiniteAutomaton::minimize); };
+        emit operation_triggered(op);
     });
 
     connect(m_complete_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(m_main_view, &FiniteAutomaton::complete);
+        auto op = [](QGraphicsView *view) { execute_unary_operation(view, &FiniteAutomaton::complete); };
+        emit operation_triggered(op);
     });
 
     connect(m_reverse_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(m_main_view, &FiniteAutomaton::reverse);
+        auto op = [](QGraphicsView *view) { execute_unary_operation(view, &FiniteAutomaton::reverse); };
+        emit operation_triggered(op);
     });
 
     connect(m_complement_btn, &QPushButton::clicked, this, [=]() {
-        execute_unary_operation(m_main_view, &FiniteAutomaton::complement);
+        auto op = [](QGraphicsView *view) { execute_unary_operation(view, &FiniteAutomaton::complement); };
+        emit operation_triggered(op);
     });
 }
 
@@ -140,15 +145,18 @@ void OperationsDock::build_binary_group()
 void OperationsDock::setup_binary_group()
 {
     connect(m_union_btn, &QPushButton::clicked, this, [=]() {
-        execute_binary_operation(m_main_view, &FiniteAutomaton::union_with);
+        auto op = [](QGraphicsView *view) { execute_binary_operation(view, &FiniteAutomaton::union_with); };
+        emit operation_triggered(op);
     });
 
     connect(m_intersection_btn, &QPushButton::clicked, this, [=]() {
-        execute_binary_operation(m_main_view, &FiniteAutomaton::intersection_with);
+        auto op = [](QGraphicsView *view) { execute_binary_operation(view, &FiniteAutomaton::intersection_with); };
+        emit operation_triggered(op);
     });
 
     connect(m_difference_btn, &QPushButton::clicked, this, [=]() {
-        execute_binary_operation(m_main_view, &FiniteAutomaton::difference_with);
+        auto op = [](QGraphicsView *view) { execute_binary_operation(view, &FiniteAutomaton::difference_with); };
+        emit operation_triggered(op);
     });
 }
 
@@ -163,7 +171,7 @@ void OperationsDock::build_general_group()
 
 void OperationsDock::setup_general_group()
 {
-    connect(m_clone_btn, &QPushButton::clicked, this, [=]() { execute_clone(m_main_view); });
+    connect(m_clone_btn, &QPushButton::clicked, this, [=]() { emit operation_triggered(&execute_clone); });
 
-    connect(m_delete_btn, &QPushButton::clicked, this, [=]() { execute_delete(m_main_view); });
+    connect(m_delete_btn, &QPushButton::clicked, this, [=]() { emit operation_triggered(&execute_delete); });
 }

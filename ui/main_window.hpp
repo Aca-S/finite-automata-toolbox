@@ -22,6 +22,9 @@ class MainWindow::MainGraphicsView : public QGraphicsView
   public:
     MainGraphicsView(QWidget *parent = nullptr);
 
+  public slots:
+    void execute_operation(const std::function<void(QGraphicsView *view)> &op);
+
   protected:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
