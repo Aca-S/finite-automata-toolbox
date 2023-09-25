@@ -19,17 +19,7 @@ SceneTabBar::SceneTabBar(QWidget *parent) : QTabBar(parent)
     add_scene(new AutomataScene);
 }
 
-AutomataScene *SceneTabBar::get_scene(int index) { return m_automata_scenes.at(index); }
-
-AutomataScene *SceneTabBar::get_scene() { return get_scene(currentIndex()); }
-
-void SceneTabBar::update_scene_tab_name(int index)
-{
-    auto scene_name = m_automata_scenes.at(index)->get_name();
-    scene_name.isEmpty() ? setTabText(index, "Untitled") : setTabText(index, scene_name);
-}
-
-void SceneTabBar::update_scene_tab_name() { return update_scene_tab_name(currentIndex()); }
+AutomataScene *SceneTabBar::get_current_scene() { return m_automata_scenes.at(currentIndex()); }
 
 void SceneTabBar::add_scene(AutomataScene *scene)
 {

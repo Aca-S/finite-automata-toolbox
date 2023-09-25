@@ -13,12 +13,7 @@ class SceneTabBar : public QTabBar
 
   public:
     SceneTabBar(QWidget *parent = nullptr);
-
-    AutomataScene *get_scene(int index);
-    AutomataScene *get_scene();
-
-    void update_scene_tab_name(int index);
-    void update_scene_tab_name();
+    AutomataScene *get_current_scene();
 
   public slots:
     void add_scene(AutomataScene *scene);

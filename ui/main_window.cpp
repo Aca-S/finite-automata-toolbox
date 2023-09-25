@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     MainGraphicsView *main_view = new MainGraphicsView(this);
     SceneTabBar *tab_bar = new SceneTabBar(this);
-    main_view->setScene(tab_bar->get_scene());
+    main_view->setScene(tab_bar->get_current_scene());
 
     QWidget *central_widget = new QWidget(this);
     QVBoxLayout *central_layout = new QVBoxLayout(central_widget);
@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->setCentralWidget(central_widget);
 
     auto menu_bar = new MenuBar(this);
-    menu_bar->set_scene(tab_bar->get_scene());
+    menu_bar->set_scene(tab_bar->get_current_scene());
     this->setMenuBar(menu_bar);
 
     auto view_dock = new ViewDock(this);
