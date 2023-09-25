@@ -25,10 +25,14 @@ class MainWindow::MainGraphicsView : public QGraphicsView
   public slots:
     void execute_operation(const std::function<void(QGraphicsView *view)> &op);
 
+  signals:
+    void viewport_center_changed(QPointF new_center);
+
   protected:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 
   private:
     qreal m_current_scale_factor = 1.0;

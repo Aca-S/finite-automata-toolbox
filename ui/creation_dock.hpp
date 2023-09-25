@@ -8,6 +8,8 @@
 #include <QListWidget>
 #include <QPushButton>
 
+#include "automata_scene.hpp"
+
 namespace Ui {
 class CreationDock : public QDockWidget
 {
@@ -15,6 +17,10 @@ class CreationDock : public QDockWidget
 
   public:
     CreationDock(QWidget *parent = nullptr);
+
+  public slots:
+    void set_scene(AutomataScene *scene);
+    void set_viewport_center(QPointF center);
 
   private:
     void build_element_group();
@@ -34,8 +40,8 @@ class CreationDock : public QDockWidget
     QPushButton *m_regex_construct_btn;
     QLabel *m_regex_construct_info;
 
-  signals:
-    void operation_triggered(const std::function<void(QGraphicsView *view)> &op);
+    AutomataScene *m_current_scene;
+    QPointF m_viewport_center;
 };
 } // namespace Ui
 

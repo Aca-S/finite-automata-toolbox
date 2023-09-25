@@ -21,50 +21,50 @@ QGroupBox *create_operation_group(const QString &title, QBoxLayout *layout, cons
     return group;
 }
 
-void execute_unary_operation(QGraphicsView *view, const auto &operation)
+void execute_unary_operation(AutomataScene *scene, const auto &operation)
 {
-    for (auto *graph : get_selected<AutomatonGraph>(view->scene())) {
+    for (auto *graph : get_selected<AutomatonGraph>(scene)) {
         auto *new_graph = new AutomatonGraph((graph->get_automaton().*operation)());
-        add_item_at_pos(new_graph, view->scene(), get_center_pos(graph));
+        add_item_at_pos(new_graph, scene, get_center_pos(graph));
         new_graph->setSelected(true);
-        view->scene()->removeItem(graph);
+        scene->removeItem(graph);
     }
 }
 
-void execute_binary_operation(QGraphicsView *view, const auto &operation)
+void execute_binary_operation(AutomataScene *scene, QPointF viewport_center, const auto &operation)
 {
-    auto graphs = get_selected<AutomatonGraph>(view->scene());
+    auto graphs = get_selected<AutomatonGraph>(scene);
 
     // TODO: Can be replaced with one call to std::ranges::fold_left_first
     // once it's more widely supported.
     if (graphs.size() > 1) {
         auto it = graphs.begin();
         auto acc = (*it)->get_automaton();
-        view->scene()->removeItem(*it);
+        scene->removeItem(*it);
         for (std::advance(it, 1); it != graphs.end(); ++it) {
             acc = (acc.*operation)((*it)->get_automaton());
-            view->scene()->removeItem(*it);
+            scene->removeItem(*it);
         }
         auto *new_graph = new AutomatonGraph(acc);
-        add_item_at_pos(new_graph, view->scene(), get_viewport_center_pos(view));
+        add_item_at_pos(new_graph, scene, viewport_center);
         new_graph->setSelected(true);
     }
 }
 
-void execute_clone(QGraphicsView *view)
+void execute_clone(AutomataScene *scene)
 {
-    for (auto *graph : get_selected<AutomatonGraph>(view->scene())) {
+    for (auto *graph : get_selected<AutomatonGraph>(scene)) {
         auto *new_graph = new AutomatonGraph((graph->get_automaton()));
-        add_item_at_pos(new_graph, view->scene(), get_center_pos(graph) + QPointF(20, 20));
+        add_item_at_pos(new_graph, scene, get_center_pos(graph) + QPointF(20, 20));
         graph->setSelected(false);
         new_graph->setSelected(true);
     }
 }
 
-void execute_delete(QGraphicsView *view)
+void execute_delete(AutomataScene *scene)
 {
-    for (auto *graph : get_selected<AutomatonGraph>(view->scene()))
-        view->scene()->removeItem(graph);
+    for (auto *graph : get_selected<AutomatonGraph>(scene))
+        scene->removeItem(graph);
 }
 } // namespace
 
@@ -90,6 +90,10 @@ OperationsDock::OperationsDock(QWidget *parent) : QDockWidget(parent)
     main_layout->addStretch();
 }
 
+void OperationsDock::set_scene(AutomataScene *scene) { m_current_scene = scene; }
+
+void OperationsDock::set_viewport_center(QPointF center) { m_viewport_center = center; }
+
 void OperationsDock::build_unary_group()
 {
     m_determinize_btn = new QPushButton("Determinize");
@@ -106,28 +110,23 @@ void OperationsDock::build_unary_group()
 void OperationsDock::setup_unary_group()
 {
     connect(m_determinize_btn, &QPushButton::clicked, this, [=]() {
-        auto op = [](QGraphicsView *view) { execute_unary_operation(view, &FiniteAutomaton::determinize); };
-        emit operation_triggered(op);
+        execute_unary_operation(m_current_scene, &FiniteAutomaton::determinize);
     });
 
     connect(m_minimize_btn, &QPushButton::clicked, this, [=]() {
-        auto op = [](QGraphicsView *view) { execute_unary_operation(view, &FiniteAutomaton::minimize); };
-        emit operation_triggered(op);
+        execute_unary_operation(m_current_scene, &FiniteAutomaton::minimize);
     });
 
     connect(m_complete_btn, &QPushButton::clicked, this, [=]() {
-        auto op = [](QGraphicsView *view) { execute_unary_operation(view, &FiniteAutomaton::complete); };
-        emit operation_triggered(op);
+        execute_unary_operation(m_current_scene, &FiniteAutomaton::complete);
     });
 
     connect(m_reverse_btn, &QPushButton::clicked, this, [=]() {
-        auto op = [](QGraphicsView *view) { execute_unary_operation(view, &FiniteAutomaton::reverse); };
-        emit operation_triggered(op);
+        execute_unary_operation(m_current_scene, &FiniteAutomaton::reverse);
     });
 
     connect(m_complement_btn, &QPushButton::clicked, this, [=]() {
-        auto op = [](QGraphicsView *view) { execute_unary_operation(view, &FiniteAutomaton::complement); };
-        emit operation_triggered(op);
+        execute_unary_operation(m_current_scene, &FiniteAutomaton::complement);
     });
 }
 
@@ -145,18 +144,15 @@ void OperationsDock::build_binary_group()
 void OperationsDock::setup_binary_group()
 {
     connect(m_union_btn, &QPushButton::clicked, this, [=]() {
-        auto op = [](QGraphicsView *view) { execute_binary_operation(view, &FiniteAutomaton::union_with); };
-        emit operation_triggered(op);
+        execute_binary_operation(m_current_scene, m_viewport_center, &FiniteAutomaton::union_with);
     });
 
     connect(m_intersection_btn, &QPushButton::clicked, this, [=]() {
-        auto op = [](QGraphicsView *view) { execute_binary_operation(view, &FiniteAutomaton::intersection_with); };
-        emit operation_triggered(op);
+        execute_binary_operation(m_current_scene, m_viewport_center, &FiniteAutomaton::intersection_with);
     });
 
     connect(m_difference_btn, &QPushButton::clicked, this, [=]() {
-        auto op = [](QGraphicsView *view) { execute_binary_operation(view, &FiniteAutomaton::difference_with); };
-        emit operation_triggered(op);
+        execute_binary_operation(m_current_scene, m_viewport_center, &FiniteAutomaton::difference_with);
     });
 }
 
@@ -171,7 +167,7 @@ void OperationsDock::build_general_group()
 
 void OperationsDock::setup_general_group()
 {
-    connect(m_clone_btn, &QPushButton::clicked, this, [=]() { emit operation_triggered(&execute_clone); });
+    connect(m_clone_btn, &QPushButton::clicked, this, [=]() { execute_clone(m_current_scene); });
 
-    connect(m_delete_btn, &QPushButton::clicked, this, [=]() { emit operation_triggered(&execute_delete); });
+    connect(m_delete_btn, &QPushButton::clicked, this, [=]() { execute_delete(m_current_scene); });
 }

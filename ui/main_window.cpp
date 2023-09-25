@@ -8,6 +8,7 @@
 #include "menu_bar.hpp"
 #include "operations_dock.hpp"
 #include "scene_tab_bar.hpp"
+#include "utility.hpp"
 #include "view_dock.hpp"
 
 using namespace Ui;
@@ -32,12 +33,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->setMenuBar(menu_bar);
 
     auto view_dock = new ViewDock(this);
+    view_dock->set_scene(tab_bar->get_current_scene());
     auto creation_dock = new CreationDock(this);
-    auto operation_dock = new OperationsDock(this);
+    creation_dock->set_scene(tab_bar->get_current_scene());
+    auto operations_dock = new OperationsDock(this);
+    operations_dock->set_scene(tab_bar->get_current_scene());
 
     this->addDockWidget(Qt::LeftDockWidgetArea, view_dock);
     this->addDockWidget(Qt::LeftDockWidgetArea, creation_dock);
-    this->addDockWidget(Qt::RightDockWidgetArea, operation_dock);
+    this->addDockWidget(Qt::RightDockWidgetArea, operations_dock);
 
     connect(menu_bar, &MenuBar::scene_opened, tab_bar, &SceneTabBar::add_scene);
     connect(menu_bar, &MenuBar::scene_closed, tab_bar, &SceneTabBar::remove_current_scene);
@@ -45,10 +49,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(tab_bar, &SceneTabBar::scene_changed, main_view, &QGraphicsView::setScene);
     connect(tab_bar, &SceneTabBar::scene_changed, menu_bar, &MenuBar::set_scene);
+    connect(tab_bar, &SceneTabBar::scene_changed, view_dock, &ViewDock::set_scene);
+    connect(tab_bar, &SceneTabBar::scene_changed, creation_dock, &CreationDock::set_scene);
+    connect(tab_bar, &SceneTabBar::scene_changed, operations_dock, &OperationsDock::set_scene);
 
-    connect(view_dock, &ViewDock::operation_triggered, main_view, &MainGraphicsView::execute_operation);
-    connect(creation_dock, &CreationDock::operation_triggered, main_view, &MainGraphicsView::execute_operation);
-    connect(operation_dock, &OperationsDock::operation_triggered, main_view, &MainGraphicsView::execute_operation);
+    connect(main_view, &MainGraphicsView::viewport_center_changed, creation_dock, &CreationDock::set_viewport_center);
+    connect(
+        main_view, &MainGraphicsView::viewport_center_changed, operations_dock, &OperationsDock::set_viewport_center);
 }
 
 void MainWindow::MainGraphicsView::execute_operation(const std::function<void(QGraphicsView *view)> &op) { op(this); }
@@ -95,4 +102,11 @@ void MainWindow::MainGraphicsView::wheelEvent(QWheelEvent *event)
             m_current_scale_factor = new_scale_factor;
         }
     }
+}
+
+void MainWindow::MainGraphicsView::paintEvent(QPaintEvent *event)
+{
+    // Used for capturing the current viewport center.
+    emit viewport_center_changed(Utility::get_viewport_center_pos(this));
+    QGraphicsView::paintEvent(event);
 }

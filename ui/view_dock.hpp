@@ -7,6 +7,8 @@
 #include <QLineEdit>
 #include <QPushButton>
 
+#include "automata_scene.hpp"
+
 namespace Ui {
 class ViewDock : public QDockWidget
 {
@@ -16,6 +18,7 @@ class ViewDock : public QDockWidget
 
   public:
     ViewDock(QWidget *parent = nullptr);
+    void set_scene(AutomataScene *scene);
 
   private:
     void build_view_section();
@@ -39,8 +42,7 @@ class ViewDock : public QDockWidget
 
     QLabel *m_view_info;
 
-  signals:
-    void operation_triggered(const std::function<void(QGraphicsView *view)> &op);
+    AutomataScene *m_current_scene;
 };
 
 class ViewDock::SideGraphicsView : public QGraphicsView

@@ -34,6 +34,10 @@ CreationDock::CreationDock(QWidget *parent) : QDockWidget(parent)
     main_layout->addStretch();
 }
 
+void CreationDock::set_scene(AutomataScene *scene) { m_current_scene = scene; }
+
+void CreationDock::set_viewport_center(QPointF center) { m_viewport_center = center; }
+
 const QString symbol_regex = "[!-~]"; // Printable ASCII characters without space.
 const QString unsigned_regex = "(0|[1-9]\\d*)";
 
@@ -164,11 +168,8 @@ void CreationDock::construct_by_element()
 
     auto automaton = FiniteAutomaton::construct(alphabet, states, initial_states, final_states, transition_function);
     if (automaton) {
-        auto op = [automaton](QGraphicsView *view) {
-            auto graph = new AutomatonGraph(*automaton);
-            add_item_at_pos(graph, view->scene(), get_viewport_center_pos(view));
-        };
-        emit operation_triggered(op);
+        auto graph = new AutomatonGraph(*automaton);
+        add_item_at_pos(graph, m_current_scene, m_viewport_center);
     } else
         m_element_construct_info->setText(QString::fromUtf8(automaton.error().c_str()));
 }
@@ -205,11 +206,8 @@ void CreationDock::construct_by_regex()
     std::string regex(m_regex_le->text().toUtf8().constData());
     auto automaton = FiniteAutomaton::construct(regex);
     if (automaton) {
-        auto op = [automaton](QGraphicsView *view) {
-            auto graph = new AutomatonGraph(*automaton);
-            add_item_at_pos(graph, view->scene(), get_viewport_center_pos(view));
-        };
-        emit operation_triggered(op);
+        auto graph = new AutomatonGraph(*automaton);
+        add_item_at_pos(graph, m_current_scene, m_viewport_center);
     } else
         m_regex_construct_info->setText(QString::fromUtf8(automaton.error().c_str()));
 }
