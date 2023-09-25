@@ -3,6 +3,7 @@
 
 #include <QMenuBar>
 
+#include "automata_scene.hpp"
 #include "scene_tab_bar.hpp"
 
 namespace Ui {
@@ -11,7 +12,15 @@ class MenuBar : public QMenuBar
     Q_OBJECT
 
   public:
-    MenuBar(SceneTabBar *scene_tab_bar, QWidget *parent = nullptr);
+    MenuBar(QWidget *parent = nullptr);
+
+  public slots:
+    void set_scene(AutomataScene *scene);
+
+  signals:
+    void scene_opened(AutomataScene *scene);
+    void scene_closed();
+    void scene_saved_as();
 
   private:
     void build_file_menu();
@@ -31,7 +40,7 @@ class MenuBar : public QMenuBar
     QAction *m_undo_action;
     QAction *m_redo_action;
 
-    SceneTabBar *m_scene_tab_bar;
+    AutomataScene *m_current_scene;
 };
 } // namespace Ui
 

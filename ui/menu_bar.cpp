@@ -4,18 +4,19 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include "automata_scene.hpp"
 #include "automaton_graph.hpp"
 #include "finite_automaton.hpp"
 
 using namespace Ui;
 using namespace Ui::Utility;
 
-MenuBar::MenuBar(SceneTabBar *scene_tab_bar, QWidget *parent) : QMenuBar(parent), m_scene_tab_bar(scene_tab_bar)
+MenuBar::MenuBar(QWidget *parent) : QMenuBar(parent)
 {
     build_file_menu();
     setup_file_menu();
 }
+
+void MenuBar::set_scene(AutomataScene *scene) { m_current_scene = scene; }
 
 void MenuBar::build_file_menu()
 {
@@ -33,12 +34,12 @@ void MenuBar::build_file_menu()
 
 void MenuBar::setup_file_menu()
 {
-    connect(m_new_action, &QAction::triggered, this, [=]() { m_scene_tab_bar->add_scene_tab(); });
+    connect(m_new_action, &QAction::triggered, this, [=]() { emit scene_opened(new AutomataScene); });
 
     connect(m_open_action, &QAction::triggered, this, [=]() { open_with_dialog(); });
 
     connect(m_save_action, &QAction::triggered, this, [=]() {
-        auto scene_name = m_scene_tab_bar->get_scene()->get_name();
+        auto scene_name = m_current_scene->get_name();
         if (scene_name.isEmpty())
             save_with_dialog();
         else
@@ -47,12 +48,12 @@ void MenuBar::setup_file_menu()
 
     connect(m_save_as_action, &QAction::triggered, this, [=]() { save_with_dialog(); });
 
-    connect(m_close_action, &QAction::triggered, this, [=]() { m_scene_tab_bar->remove_scene_tab(); });
+    connect(m_close_action, &QAction::triggered, this, [=]() { emit scene_closed(); });
 }
 
 void MenuBar::save_file(const QString &file_name)
 {
-    auto error = m_scene_tab_bar->get_scene()->save_to_file(file_name);
+    auto error = m_current_scene->save_to_file(file_name);
     if (error)
         QMessageBox::information(this, "File error", *error);
 }
@@ -65,7 +66,7 @@ void MenuBar::save_with_dialog()
         return;
     else {
         save_file(file_name);
-        m_scene_tab_bar->update_scene_tab_name();
+        emit scene_saved_as();
     }
 }
 
@@ -76,9 +77,9 @@ void MenuBar::open_with_dialog()
     if (file_name.isEmpty())
         return;
     else {
-        auto scene = AutomataScene::load_from_file(file_name, m_scene_tab_bar);
+        auto scene = AutomataScene::load_from_file(file_name);
         if (scene)
-            m_scene_tab_bar->add_scene_tab(*scene);
+            emit scene_opened(*scene);
         else
             QMessageBox::information(this, "File error", scene.error());
     }

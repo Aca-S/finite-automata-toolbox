@@ -17,7 +17,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->setWindowTitle("Finite Automata Toolbox");
 
     MainGraphicsView *main_view = new MainGraphicsView(this);
-    SceneTabBar *tab_bar = new SceneTabBar(main_view, this);
+    SceneTabBar *tab_bar = new SceneTabBar(this);
+    main_view->setScene(tab_bar->get_scene());
 
     QWidget *central_widget = new QWidget(this);
     QVBoxLayout *central_layout = new QVBoxLayout(central_widget);
@@ -26,7 +27,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     central_layout->setSpacing(0);
     this->setCentralWidget(central_widget);
 
-    this->setMenuBar(new MenuBar(tab_bar, this));
+    auto menu_bar = new MenuBar(this);
+    menu_bar->set_scene(tab_bar->get_scene());
+    this->setMenuBar(menu_bar);
 
     auto view_dock = new ViewDock(this);
     auto creation_dock = new CreationDock(this);
@@ -35,6 +38,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->addDockWidget(Qt::LeftDockWidgetArea, view_dock);
     this->addDockWidget(Qt::LeftDockWidgetArea, creation_dock);
     this->addDockWidget(Qt::RightDockWidgetArea, operation_dock);
+
+    connect(menu_bar, &MenuBar::scene_opened, tab_bar, &SceneTabBar::add_scene);
+    connect(menu_bar, &MenuBar::scene_closed, tab_bar, &SceneTabBar::remove_current_scene);
+    connect(menu_bar, &MenuBar::scene_saved_as, tab_bar, &SceneTabBar::update_current_tab_label);
+
+    connect(tab_bar, &SceneTabBar::scene_changed, main_view, &QGraphicsView::setScene);
+    connect(tab_bar, &SceneTabBar::scene_changed, menu_bar, &MenuBar::set_scene);
 
     connect(view_dock, &ViewDock::operation_triggered, main_view, &MainGraphicsView::execute_operation);
     connect(creation_dock, &CreationDock::operation_triggered, main_view, &MainGraphicsView::execute_operation);

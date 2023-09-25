@@ -9,13 +9,10 @@
 namespace Ui {
 class SceneTabBar : public QTabBar
 {
+    Q_OBJECT
+
   public:
-    SceneTabBar(QGraphicsView *main_view, QWidget *parent = nullptr);
-
-    int add_scene_tab(AutomataScene *scene = nullptr);
-
-    void remove_scene_tab(int index);
-    void remove_scene_tab();
+    SceneTabBar(QWidget *parent = nullptr);
 
     AutomataScene *get_scene(int index);
     AutomataScene *get_scene();
@@ -23,10 +20,16 @@ class SceneTabBar : public QTabBar
     void update_scene_tab_name(int index);
     void update_scene_tab_name();
 
+  public slots:
+    void add_scene(AutomataScene *scene);
+    void remove_current_scene();
+    void update_current_tab_label();
+
+  signals:
+    void scene_changed(AutomataScene *scene);
+
   private:
     QList<AutomataScene *> m_automata_scenes;
-
-    QGraphicsView *m_main_view;
 };
 } // namespace Ui
 
