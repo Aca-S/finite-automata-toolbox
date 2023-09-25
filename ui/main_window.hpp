@@ -22,9 +22,6 @@ class MainWindow::MainGraphicsView : public QGraphicsView
   public:
     MainGraphicsView(QWidget *parent = nullptr);
 
-  public slots:
-    void execute_operation(const std::function<void(QGraphicsView *view)> &op);
-
   signals:
     void viewport_center_changed(QPointF new_center);
 

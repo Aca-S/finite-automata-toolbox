@@ -58,8 +58,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
         main_view, &MainGraphicsView::viewport_center_changed, operations_dock, &OperationsDock::set_viewport_center);
 }
 
-void MainWindow::MainGraphicsView::execute_operation(const std::function<void(QGraphicsView *view)> &op) { op(this); }
-
 MainWindow::MainGraphicsView::MainGraphicsView(QWidget *parent) : QGraphicsView(parent)
 {
     setDragMode(QGraphicsView::ScrollHandDrag);
