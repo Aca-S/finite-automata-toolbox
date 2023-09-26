@@ -169,7 +169,7 @@ void CreationDock::construct_by_element()
     auto automaton = FiniteAutomaton::construct(alphabet, states, initial_states, final_states, transition_function);
     if (automaton) {
         auto graph = new AutomatonGraph(*automaton);
-        add_item_at_pos(graph, m_current_scene, m_viewport_center);
+        m_current_scene->add_automata({{graph, m_viewport_center}});
     } else
         m_element_construct_info->setText(QString::fromUtf8(automaton.error().c_str()));
 }
@@ -207,7 +207,7 @@ void CreationDock::construct_by_regex()
     auto automaton = FiniteAutomaton::construct(regex);
     if (automaton) {
         auto graph = new AutomatonGraph(*automaton);
-        add_item_at_pos(graph, m_current_scene, m_viewport_center);
+        m_current_scene->add_automata({{graph, m_viewport_center}});
     } else
         m_regex_construct_info->setText(QString::fromUtf8(automaton.error().c_str()));
 }

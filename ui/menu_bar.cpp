@@ -14,6 +14,9 @@ MenuBar::MenuBar(QWidget *parent) : QMenuBar(parent)
 {
     build_file_menu();
     setup_file_menu();
+
+    build_edit_menu();
+    setup_edit_menu();
 }
 
 void MenuBar::set_scene(AutomataScene *scene) { m_current_scene = scene; }
@@ -26,10 +29,6 @@ void MenuBar::build_file_menu()
     m_save_action = m_file_menu->addAction("Save");
     m_save_as_action = m_file_menu->addAction("Save As");
     m_close_action = m_file_menu->addAction("Close");
-
-    m_edit_menu = this->addMenu("Edit");
-    m_undo_action = m_edit_menu->addAction("Undo");
-    m_redo_action = m_edit_menu->addAction("Redo");
 }
 
 void MenuBar::setup_file_menu()
@@ -83,4 +82,18 @@ void MenuBar::open_with_dialog()
         else
             QMessageBox::information(this, "File error", scene.error());
     }
+}
+
+void MenuBar::build_edit_menu()
+{
+    m_edit_menu = this->addMenu("Edit");
+    m_undo_action = m_edit_menu->addAction("Undo");
+    m_redo_action = m_edit_menu->addAction("Redo");
+}
+
+void MenuBar::setup_edit_menu()
+{
+    connect(m_undo_action, &QAction::triggered, this, [=]() { m_current_scene->undo_action(); });
+
+    connect(m_redo_action, &QAction::triggered, this, [=]() { m_current_scene->redo_action(); });
 }

@@ -14,6 +14,10 @@ AutomataScene::AutomataScene(QWidget *parent) : QGraphicsScene(parent) {}
 
 QString AutomataScene::get_name() const { return m_name; }
 
+void AutomataScene::undo_action() { m_undo_stack->undo(); }
+
+void AutomataScene::redo_action() { m_undo_stack->redo(); }
+
 namespace {
 std::expected<FiniteAutomaton, QString> deserialize_automaton(QDataStream &in)
 {
@@ -142,6 +146,8 @@ void AutomataScene::AddCommand::undo()
 
 void AutomataScene::AddCommand::redo()
 {
-    for (auto &[item, pos] : m_items)
+    for (auto &[item, pos] : m_items) {
         Utility::add_item_at_pos(item, m_scene, pos);
+        item->setSelected(false);
+    }
 }

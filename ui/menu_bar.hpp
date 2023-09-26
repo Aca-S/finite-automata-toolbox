@@ -29,6 +29,9 @@ class MenuBar : public QMenuBar
     void save_with_dialog();
     void open_with_dialog();
 
+    void build_edit_menu();
+    void setup_edit_menu();
+
     QMenu *m_file_menu;
     QAction *m_new_action;
     QAction *m_open_action;

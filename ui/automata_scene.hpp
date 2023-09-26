@@ -23,6 +23,10 @@ class AutomataScene : public QGraphicsScene
 
     QString get_name() const;
 
+  public slots:
+    void undo_action();
+    void redo_action();
+
   private:
     QString m_name;
     QUndoStack *m_undo_stack = new QUndoStack(this);
