@@ -23,12 +23,21 @@ void MenuBar::set_scene(AutomataScene *scene) { m_current_scene = scene; }
 
 void MenuBar::build_file_menu()
 {
-    m_file_menu = this->addMenu("File");
+    m_file_menu = this->addMenu("&File");
+
     m_new_action = m_file_menu->addAction("New");
+    m_new_action->setShortcuts(QKeySequence::New);
+
     m_open_action = m_file_menu->addAction("Open");
+    m_open_action->setShortcuts(QKeySequence::Open);
+
     m_save_action = m_file_menu->addAction("Save");
+    m_save_action->setShortcuts(QKeySequence::Save);
+
     m_save_as_action = m_file_menu->addAction("Save As");
+
     m_close_action = m_file_menu->addAction("Close");
+    m_close_action->setShortcuts(QKeySequence::Close);
 }
 
 void MenuBar::setup_file_menu()
