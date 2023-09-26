@@ -132,9 +132,14 @@ void AutomataScene::add_automata(const QList<QPair<QGraphicsItem *, QPointF>> &i
     m_undo_stack->push(new AddCommand(this, items));
 }
 
+void AutomataScene::remove_automata(const QList<QGraphicsItem *> &items)
+{
+    m_undo_stack->push(new RemoveCommand(this, items));
+}
+
 AutomataScene::AddCommand::AddCommand(
     QGraphicsScene *scene, const QList<QPair<QGraphicsItem *, QPointF>> &items, QUndoCommand *parent)
-    : m_scene(scene), m_items(items)
+    : m_scene(scene), m_items(items), QUndoCommand(parent)
 {
 }
 
@@ -146,8 +151,24 @@ void AutomataScene::AddCommand::undo()
 
 void AutomataScene::AddCommand::redo()
 {
-    for (auto &[item, pos] : m_items) {
+    for (auto &[item, pos] : m_items)
         Utility::add_item_at_pos(item, m_scene, pos);
-        item->setSelected(false);
-    }
+}
+
+AutomataScene::RemoveCommand::RemoveCommand(
+    QGraphicsScene *scene, const QList<QGraphicsItem *> &items, QUndoCommand *parent)
+    : m_scene(scene), m_items(items), QUndoCommand(parent)
+{
+}
+
+void AutomataScene::RemoveCommand::undo()
+{
+    for (auto *item : m_items)
+        m_scene->addItem(item);
+}
+
+void AutomataScene::RemoveCommand::redo()
+{
+    for (auto *item : m_items)
+        m_scene->removeItem(item);
 }

@@ -53,19 +53,18 @@ void execute_binary_operation(AutomataScene *scene, QPointF viewport_center, con
 
 void execute_clone(AutomataScene *scene)
 {
+    QList<QPair<QGraphicsItem *, QPointF>> graphs;
     for (auto *graph : get_selected<AutomatonGraph>(scene)) {
         auto *new_graph = new AutomatonGraph((graph->get_automaton()));
-        add_item_at_pos(new_graph, scene, get_center_pos(graph) + QPointF(20, 20));
+        QPointF new_pos = get_center_pos(graph) + QPointF(20, 20);
+        graphs.append({new_graph, new_pos});
         graph->setSelected(false);
         new_graph->setSelected(true);
     }
+    scene->add_automata(graphs);
 }
 
-void execute_delete(AutomataScene *scene)
-{
-    for (auto *graph : get_selected<AutomatonGraph>(scene))
-        scene->removeItem(graph);
-}
+void execute_delete(AutomataScene *scene) { scene->remove_automata(scene->selectedItems()); }
 } // namespace
 
 OperationsDock::OperationsDock(QWidget *parent) : QDockWidget(parent)

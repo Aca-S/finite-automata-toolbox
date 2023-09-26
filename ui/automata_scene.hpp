@@ -12,6 +12,7 @@ namespace Ui {
 class AutomataScene : public QGraphicsScene
 {
     class AddCommand;
+    class RemoveCommand;
 
   public:
     AutomataScene(QWidget *parent = nullptr);
@@ -20,6 +21,7 @@ class AutomataScene : public QGraphicsScene
     std::optional<QString> save_to_file(const QString &file_name);
 
     void add_automata(const QList<QPair<QGraphicsItem *, QPointF>> &items);
+    void remove_automata(const QList<QGraphicsItem *> &items);
 
     QString get_name() const;
 
@@ -44,6 +46,19 @@ class AutomataScene::AddCommand : public QUndoCommand
   private:
     QGraphicsScene *m_scene;
     QList<QPair<QGraphicsItem *, QPointF>> m_items;
+};
+
+class AutomataScene::RemoveCommand : public QUndoCommand
+{
+  public:
+    RemoveCommand(QGraphicsScene *scene, const QList<QGraphicsItem *> &items, QUndoCommand *parent = nullptr);
+
+    void undo() override;
+    void redo() override;
+
+  private:
+    QGraphicsScene *m_scene;
+    QList<QGraphicsItem *> m_items;
 };
 } // namespace Ui
 
