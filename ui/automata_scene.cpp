@@ -182,8 +182,10 @@ AutomataScene::AddCommand::AddCommand(
 
 void AutomataScene::AddCommand::undo()
 {
-    for (auto &[item, _] : m_items)
+    for (auto &[item, _] : m_items) {
+        item->setSelected(false);
         m_scene->removeItem(item);
+    }
 }
 
 void AutomataScene::AddCommand::redo()
@@ -200,8 +202,10 @@ AutomataScene::RemoveCommand::RemoveCommand(
 
 void AutomataScene::RemoveCommand::undo()
 {
-    for (auto *item : m_items)
+    for (auto *item : m_items) {
+        item->setSelected(false);
         m_scene->addItem(item);
+    }
 }
 
 void AutomataScene::RemoveCommand::redo()
@@ -219,11 +223,15 @@ AutomataScene::ReplaceCommand::ReplaceCommand(
 
 void AutomataScene::ReplaceCommand::undo()
 {
-    for (auto &[item, _] : m_new_items)
+    for (auto &[item, _] : m_new_items) {
+        item->setSelected(false);
         m_scene->removeItem(item);
+    }
 
-    for (auto *item : m_old_items)
+    for (auto *item : m_old_items) {
+        item->setSelected(false);
         m_scene->addItem(item);
+    }
 }
 
 void AutomataScene::ReplaceCommand::redo()
@@ -245,8 +253,10 @@ AutomataScene::MoveCommand::MoveCommand(
 
 void AutomataScene::MoveCommand::undo()
 {
-    for (auto &[item, old_pos] : m_old_positions)
+    for (auto &[item, old_pos] : m_old_positions) {
+        item->setSelected(false);
         item->setPos(old_pos);
+    }
 }
 
 void AutomataScene::MoveCommand::redo()
