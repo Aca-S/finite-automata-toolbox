@@ -14,6 +14,7 @@ class AutomataScene : public QGraphicsScene
     class AddCommand;
     class RemoveCommand;
     class ReplaceCommand;
+    class MoveCommand;
 
   public:
     AutomataScene(QWidget *parent = nullptr);
@@ -25,6 +26,7 @@ class AutomataScene : public QGraphicsScene
     void remove_automata(const QList<QGraphicsItem *> &items);
     void
     replace_automata(const QList<QGraphicsItem *> &old_items, const QList<QPair<QGraphicsItem *, QPointF>> &new_items);
+    void move_automata(const QList<QPair<QGraphicsItem *, QPointF>> &old_positions);
 
     QString get_name() const;
 
@@ -32,9 +34,15 @@ class AutomataScene : public QGraphicsScene
     void undo_action();
     void redo_action();
 
+  protected:
+    // Override the mouse press and release events to detect scene item movements.
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+
   private:
     QString m_name;
     QUndoStack *m_undo_stack = new QUndoStack(this);
+    QList<QPair<QGraphicsItem *, QPointF>> m_moving_items;
 };
 
 class AutomataScene::AddCommand : public QUndoCommand
@@ -78,6 +86,22 @@ class AutomataScene::ReplaceCommand : public QUndoCommand
     QGraphicsScene *m_scene;
     QList<QGraphicsItem *> m_old_items;
     QList<QPair<QGraphicsItem *, QPointF>> m_new_items;
+};
+
+class AutomataScene::MoveCommand : public QUndoCommand
+{
+  public:
+    MoveCommand(
+        QGraphicsScene *scene, const QList<QPair<QGraphicsItem *, QPointF>> &old_positions,
+        QUndoCommand *parent = nullptr);
+
+    void undo() override;
+    void redo() override;
+
+  private:
+    QGraphicsScene *m_scene;
+    QList<QPair<QGraphicsItem *, QPointF>> m_old_positions;
+    QList<QPointF> m_new_positions;
 };
 } // namespace Ui
 

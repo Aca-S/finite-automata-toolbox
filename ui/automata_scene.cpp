@@ -6,6 +6,7 @@
 
 #include <QDataStream>
 #include <QFile>
+#include <QGraphicsSceneMouseEvent>
 #include <QWidget>
 
 using namespace Ui;
@@ -127,6 +128,31 @@ std::optional<QString> AutomataScene::save_to_file(const QString &file_name)
     return std::nullopt;
 }
 
+void AutomataScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    // Must handle the base class event before grabbing the selected items.
+    QGraphicsScene::mousePressEvent(event);
+
+    m_moving_items.clear();
+    for (auto *item : this->selectedItems())
+        m_moving_items.append({item, item->pos()});
+}
+
+void AutomataScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsScene::mouseReleaseEvent(event);
+
+    if (event->button() == Qt::LeftButton) {
+        for (auto &[item, old_pos] : m_moving_items) {
+            // If any item at all changed its position, trigger the move action.
+            if (old_pos != item->pos()) {
+                move_automata(m_moving_items);
+                break;
+            }
+        }
+    }
+}
+
 void AutomataScene::add_automata(const QList<QPair<QGraphicsItem *, QPointF>> &items)
 {
     m_undo_stack->push(new AddCommand(this, items));
@@ -141,6 +167,11 @@ void AutomataScene::replace_automata(
     const QList<QGraphicsItem *> &old_items, const QList<QPair<QGraphicsItem *, QPointF>> &new_items)
 {
     m_undo_stack->push(new ReplaceCommand(this, old_items, new_items));
+}
+
+void AutomataScene::move_automata(const QList<QPair<QGraphicsItem *, QPointF>> &old_positions)
+{
+    m_undo_stack->push(new MoveCommand(this, old_positions));
 }
 
 AutomataScene::AddCommand::AddCommand(
@@ -202,4 +233,25 @@ void AutomataScene::ReplaceCommand::redo()
 
     for (auto &[item, pos] : m_new_items)
         Utility::add_item_at_pos(item, m_scene, pos);
+}
+
+AutomataScene::MoveCommand::MoveCommand(
+    QGraphicsScene *scene, const QList<QPair<QGraphicsItem *, QPointF>> &old_positions, QUndoCommand *parent)
+    : m_scene(scene), m_old_positions(old_positions), QUndoCommand(parent)
+{
+    for (auto &[item, _] : m_old_positions)
+        m_new_positions.append(item->pos());
+}
+
+void AutomataScene::MoveCommand::undo()
+{
+    for (auto &[item, old_pos] : m_old_positions)
+        item->setPos(old_pos);
+}
+
+void AutomataScene::MoveCommand::redo()
+{
+    int i = 0;
+    for (auto &[item, _] : m_old_positions)
+        item->setPos(m_new_positions[i++]);
 }
