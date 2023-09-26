@@ -23,32 +23,37 @@ QGroupBox *create_operation_group(const QString &title, QBoxLayout *layout, cons
 
 void execute_unary_operation(AutomataScene *scene, const auto &operation)
 {
-    for (auto *graph : get_selected<AutomatonGraph>(scene)) {
+    auto graphs = get_selected<AutomatonGraph>(scene);
+    QList<QPair<QGraphicsItem *, QPointF>> new_graphs;
+
+    for (auto *graph : graphs) {
         auto *new_graph = new AutomatonGraph((graph->get_automaton().*operation)());
-        add_item_at_pos(new_graph, scene, get_center_pos(graph));
+        new_graphs.append({new_graph, get_center_pos(graph)});
         new_graph->setSelected(true);
-        scene->removeItem(graph);
     }
+
+    QList<QGraphicsItem *> old_graphs(graphs.begin(), graphs.end());
+    scene->replace_automata(old_graphs, new_graphs);
 }
 
 void execute_binary_operation(AutomataScene *scene, QPointF viewport_center, const auto &operation)
 {
     auto graphs = get_selected<AutomatonGraph>(scene);
+    AutomatonGraph *new_graph;
 
     // TODO: Can be replaced with one call to std::ranges::fold_left_first
     // once it's more widely supported.
     if (graphs.size() > 1) {
         auto it = graphs.begin();
         auto acc = (*it)->get_automaton();
-        scene->removeItem(*it);
-        for (std::advance(it, 1); it != graphs.end(); ++it) {
+        for (std::advance(it, 1); it != graphs.end(); ++it)
             acc = (acc.*operation)((*it)->get_automaton());
-            scene->removeItem(*it);
-        }
-        auto *new_graph = new AutomatonGraph(acc);
-        add_item_at_pos(new_graph, scene, viewport_center);
+        new_graph = new AutomatonGraph(acc);
         new_graph->setSelected(true);
     }
+
+    QList<QGraphicsItem *> old_graphs(graphs.begin(), graphs.end());
+    scene->replace_automata(old_graphs, {{new_graph, viewport_center}});
 }
 
 void execute_clone(AutomataScene *scene)

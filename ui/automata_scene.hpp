@@ -13,6 +13,7 @@ class AutomataScene : public QGraphicsScene
 {
     class AddCommand;
     class RemoveCommand;
+    class ReplaceCommand;
 
   public:
     AutomataScene(QWidget *parent = nullptr);
@@ -22,6 +23,8 @@ class AutomataScene : public QGraphicsScene
 
     void add_automata(const QList<QPair<QGraphicsItem *, QPointF>> &items);
     void remove_automata(const QList<QGraphicsItem *> &items);
+    void
+    replace_automata(const QList<QGraphicsItem *> &old_items, const QList<QPair<QGraphicsItem *, QPointF>> &new_items);
 
     QString get_name() const;
 
@@ -59,6 +62,22 @@ class AutomataScene::RemoveCommand : public QUndoCommand
   private:
     QGraphicsScene *m_scene;
     QList<QGraphicsItem *> m_items;
+};
+
+class AutomataScene::ReplaceCommand : public QUndoCommand
+{
+  public:
+    ReplaceCommand(
+        QGraphicsScene *scene, const QList<QGraphicsItem *> &old_items,
+        const QList<QPair<QGraphicsItem *, QPointF>> &new_items, QUndoCommand *parent = nullptr);
+
+    void undo() override;
+    void redo() override;
+
+  private:
+    QGraphicsScene *m_scene;
+    QList<QGraphicsItem *> m_old_items;
+    QList<QPair<QGraphicsItem *, QPointF>> m_new_items;
 };
 } // namespace Ui
 
