@@ -86,9 +86,13 @@ void MenuBar::open_with_dialog()
 
 void MenuBar::build_edit_menu()
 {
-    m_edit_menu = this->addMenu("Edit");
-    m_undo_action = m_edit_menu->addAction("Undo");
-    m_redo_action = m_edit_menu->addAction("Redo");
+    m_edit_menu = this->addMenu("&Edit");
+
+    m_undo_action = m_edit_menu->addAction("&Undo");
+    m_undo_action->setShortcuts(QKeySequence::Undo);
+
+    m_redo_action = m_edit_menu->addAction("&Redo");
+    m_redo_action->setShortcuts(QKeySequence::Redo);
 }
 
 void MenuBar::setup_edit_menu()
