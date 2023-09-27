@@ -24,53 +24,67 @@ QGroupBox *create_operation_group(const QString &title, QBoxLayout *layout, cons
 
 void execute_unary_operation(AutomataScene *scene, const auto &operation)
 {
-    auto graphs = get_selected<AutomatonGraph>(scene);
-    QList<QPair<QGraphicsItem *, QPointF>> new_graphs;
+    auto selected_graphs = get_selected<AutomatonGraph>(scene);
 
-    for (auto *graph : graphs) {
+    if (selected_graphs.empty())
+        return;
+
+    QList<QPair<QGraphicsItem *, QPointF>> new_graphs;
+    for (auto *graph : selected_graphs) {
         auto *new_graph = new AutomatonGraph((graph->get_automaton().*operation)());
         new_graphs.append({new_graph, get_center_pos(graph)});
         new_graph->setSelected(true);
     }
 
-    QList<QGraphicsItem *> old_graphs(graphs.begin(), graphs.end());
+    QList<QGraphicsItem *> old_graphs(selected_graphs.begin(), selected_graphs.end());
     scene->replace_automata(old_graphs, new_graphs);
 }
 
 void execute_binary_operation(AutomataScene *scene, QPointF viewport_center, const auto &operation)
 {
-    auto graphs = get_selected<AutomatonGraph>(scene);
-    AutomatonGraph *new_graph;
+    auto selected_graphs = get_selected<AutomatonGraph>(scene);
+
+    if (selected_graphs.size() < 2)
+        return;
 
     // TODO: Can be replaced with one call to std::ranges::fold_left_first
     // once it's more widely supported.
-    if (graphs.size() > 1) {
-        auto it = graphs.begin();
-        auto acc = (*it)->get_automaton();
-        for (std::advance(it, 1); it != graphs.end(); ++it)
-            acc = (acc.*operation)((*it)->get_automaton());
-        new_graph = new AutomatonGraph(acc);
-        new_graph->setSelected(true);
-    }
+    auto it = selected_graphs.begin();
+    auto acc = (*it)->get_automaton();
+    for (std::advance(it, 1); it != selected_graphs.end(); ++it)
+        acc = (acc.*operation)((*it)->get_automaton());
+    auto *new_graph = new AutomatonGraph(acc);
+    new_graph->setSelected(true);
 
-    QList<QGraphicsItem *> old_graphs(graphs.begin(), graphs.end());
+    QList<QGraphicsItem *> old_graphs(selected_graphs.begin(), selected_graphs.end());
     scene->replace_automata(old_graphs, {{new_graph, viewport_center}});
 }
 
 void execute_clone(AutomataScene *scene)
 {
-    QList<QPair<QGraphicsItem *, QPointF>> graphs;
-    for (auto *graph : get_selected<AutomatonGraph>(scene)) {
+    auto selected_graphs = get_selected<AutomatonGraph>(scene);
+
+    if (selected_graphs.empty())
+        return;
+
+    QList<QPair<QGraphicsItem *, QPointF>> new_graphs;
+    for (auto *graph : selected_graphs) {
         auto *new_graph = new AutomatonGraph((graph->get_automaton()));
         QPointF new_pos = get_center_pos(graph) + QPointF(20, 20);
-        graphs.append({new_graph, new_pos});
+        new_graphs.append({new_graph, new_pos});
         graph->setSelected(false);
         new_graph->setSelected(true);
     }
-    scene->add_automata(graphs);
+    scene->add_automata(new_graphs);
 }
 
-void execute_delete(AutomataScene *scene) { scene->remove_automata(scene->selectedItems()); }
+void execute_delete(AutomataScene *scene)
+{
+    if (scene->selectedItems().empty())
+        return;
+
+    scene->remove_automata(scene->selectedItems());
+}
 } // namespace
 
 OperationsDock::OperationsDock(QWidget *parent) : QDockWidget(parent)
