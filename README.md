@@ -12,6 +12,7 @@ Features:
 ## Required for building
 
 To build this project, you will need:
+- A C++ compiler supporting C++23
 - Qt6 (could possibly work with Qt5 as well, hasn't been tested)
 - Flex
 - Bison
