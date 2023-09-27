@@ -4,6 +4,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 qt_add_library(
     ui
     main_window.cpp
+    main_graphics_view.cpp
     view_dock.cpp
     creation_dock.cpp
     operations_dock.cpp
