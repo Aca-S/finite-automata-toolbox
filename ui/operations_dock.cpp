@@ -3,6 +3,7 @@
 
 #include <QGroupBox>
 #include <QLayout>
+#include <QShortcut>
 
 #include "automaton_graph.hpp"
 #include "finite_automaton.hpp"
@@ -174,4 +175,6 @@ void OperationsDock::setup_general_group()
     connect(m_clone_btn, &QPushButton::clicked, this, [=]() { execute_clone(m_current_scene); });
 
     connect(m_delete_btn, &QPushButton::clicked, this, [=]() { execute_delete(m_current_scene); });
+    auto *delete_sc = new QShortcut(QKeySequence("Del"), this);
+    connect(delete_sc, &QShortcut::activated, m_delete_btn, &QPushButton::click);
 }
