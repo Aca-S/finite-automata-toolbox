@@ -2,57 +2,60 @@
 
 #include <QLayout>
 
-#include "creation_dock.hpp"
-#include "main_graphics_view.hpp"
-#include "menu_bar.hpp"
-#include "operations_dock.hpp"
-#include "scene_tab_bar.hpp"
-#include "utility.hpp"
-#include "view_dock.hpp"
-
 using namespace Ui;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
+    build();
+    setup();
+}
+
+void MainWindow::build()
+{
     this->setWindowTitle("Finite Automata Toolbox");
 
-    MainGraphicsView *main_view = new MainGraphicsView(this);
-    SceneTabBar *tab_bar = new SceneTabBar(this);
-    main_view->setScene(tab_bar->get_current_scene());
+    m_main_view = new MainGraphicsView(this);
+    m_tab_bar = new SceneTabBar(this);
+    m_main_view->setScene(m_tab_bar->get_current_scene());
 
-    QWidget *central_widget = new QWidget(this);
-    QVBoxLayout *central_layout = new QVBoxLayout(central_widget);
-    central_layout->addWidget(tab_bar);
-    central_layout->addWidget(main_view);
+    auto *central_widget = new QWidget(this);
+    auto *central_layout = new QVBoxLayout(central_widget);
+    central_layout->addWidget(m_tab_bar);
+    central_layout->addWidget(m_main_view);
     central_layout->setSpacing(0);
     this->setCentralWidget(central_widget);
 
-    auto menu_bar = new MenuBar(this);
-    menu_bar->set_scene(tab_bar->get_current_scene());
-    this->setMenuBar(menu_bar);
+    m_menu_bar = new MenuBar(this);
+    m_menu_bar->set_scene(m_tab_bar->get_current_scene());
+    this->setMenuBar(m_menu_bar);
 
-    auto view_dock = new ViewDock(this);
-    view_dock->set_scene(tab_bar->get_current_scene());
-    auto creation_dock = new CreationDock(this);
-    creation_dock->set_scene(tab_bar->get_current_scene());
-    auto operations_dock = new OperationsDock(this);
-    operations_dock->set_scene(tab_bar->get_current_scene());
+    m_view_dock = new ViewDock(this);
+    m_view_dock->set_scene(m_tab_bar->get_current_scene());
+    m_creation_dock = new CreationDock(this);
+    m_creation_dock->set_scene(m_tab_bar->get_current_scene());
+    m_operations_dock = new OperationsDock(this);
+    m_operations_dock->set_scene(m_tab_bar->get_current_scene());
 
-    this->addDockWidget(Qt::LeftDockWidgetArea, view_dock);
-    this->addDockWidget(Qt::LeftDockWidgetArea, creation_dock);
-    this->addDockWidget(Qt::RightDockWidgetArea, operations_dock);
+    this->addDockWidget(Qt::LeftDockWidgetArea, m_view_dock);
+    this->addDockWidget(Qt::LeftDockWidgetArea, m_creation_dock);
+    this->addDockWidget(Qt::RightDockWidgetArea, m_operations_dock);
+}
 
-    connect(menu_bar, &MenuBar::scene_opened, tab_bar, &SceneTabBar::add_scene);
-    connect(menu_bar, &MenuBar::scene_closed, tab_bar, &SceneTabBar::remove_current_scene);
-    connect(menu_bar, &MenuBar::scene_saved_as, tab_bar, &SceneTabBar::update_current_tab_label);
+void MainWindow::setup()
+{
+    connect(m_menu_bar, &MenuBar::scene_opened, m_tab_bar, &SceneTabBar::add_scene);
+    connect(m_menu_bar, &MenuBar::scene_closed, m_tab_bar, &SceneTabBar::remove_current_scene);
+    connect(m_menu_bar, &MenuBar::scene_saved_as, m_tab_bar, &SceneTabBar::update_current_tab_label);
 
-    connect(tab_bar, &SceneTabBar::scene_changed, main_view, &QGraphicsView::setScene);
-    connect(tab_bar, &SceneTabBar::scene_changed, menu_bar, &MenuBar::set_scene);
-    connect(tab_bar, &SceneTabBar::scene_changed, view_dock, &ViewDock::set_scene);
-    connect(tab_bar, &SceneTabBar::scene_changed, creation_dock, &CreationDock::set_scene);
-    connect(tab_bar, &SceneTabBar::scene_changed, operations_dock, &OperationsDock::set_scene);
+    connect(m_tab_bar, &SceneTabBar::scene_changed, m_main_view, &QGraphicsView::setScene);
+    connect(m_tab_bar, &SceneTabBar::scene_changed, m_menu_bar, &MenuBar::set_scene);
+    connect(m_tab_bar, &SceneTabBar::scene_changed, m_view_dock, &ViewDock::set_scene);
+    connect(m_tab_bar, &SceneTabBar::scene_changed, m_creation_dock, &CreationDock::set_scene);
+    connect(m_tab_bar, &SceneTabBar::scene_changed, m_operations_dock, &OperationsDock::set_scene);
 
-    connect(main_view, &MainGraphicsView::viewport_center_changed, creation_dock, &CreationDock::set_viewport_center);
     connect(
-        main_view, &MainGraphicsView::viewport_center_changed, operations_dock, &OperationsDock::set_viewport_center);
+        m_main_view, &MainGraphicsView::viewport_center_changed, m_creation_dock, &CreationDock::set_viewport_center);
+    connect(
+        m_main_view, &MainGraphicsView::viewport_center_changed, m_operations_dock,
+        &OperationsDock::set_viewport_center);
 }
