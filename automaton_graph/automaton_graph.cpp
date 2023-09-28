@@ -30,13 +30,23 @@ AutomatonGraph::AutomatonGraph(const FiniteAutomaton &automaton) : QtGraph::Grap
         }
     }
 
+    // Compress the edges to form a strict graph.
+    QMap<QPair<unsigned, unsigned>, QString> label_map;
     for (const auto &[k, v] : m_automaton.get_transition_function()) {
         for (const auto &to_state : v) {
-            QString label = k.second == FiniteAutomaton::epsilon_transition_value ? QString::fromUtf8("\u03B5")
-                                                                                  : QString(QChar(k.second));
-            Edge *edge = new TransitionEdge(label);
-            add_edge(edge, m_node_map[k.first], m_node_map[to_state]);
+            QString symbol = k.second == FiniteAutomaton::epsilon_transition_value ? QString::fromUtf8("\u03B5")
+                                                                                   : QString(QChar(k.second));
+            auto it = label_map.find({k.first, to_state});
+            if (it == label_map.end())
+                label_map.insert({k.first, to_state}, symbol);
+            else
+                it.value() = it.value() + ", " + symbol;
         }
+    }
+
+    for (const auto &[k, label] : label_map.asKeyValueRange()) {
+        Edge *edge = new TransitionEdge(label);
+        add_edge(edge, m_node_map[k.first], m_node_map[k.second]);
     }
 
     compose_layout();
