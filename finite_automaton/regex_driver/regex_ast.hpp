@@ -70,7 +70,10 @@ class SymbolAST
 
 class RegexAST
     : public std::variant<ConcatenationAST, AlternationAST, ZeroOrOneAST, ZeroOrMoreAST, OneOrMoreAST, SymbolAST>
-{};
+{
+  public:
+    using variant<ConcatenationAST, AlternationAST, ZeroOrOneAST, ZeroOrMoreAST, OneOrMoreAST, SymbolAST>::variant;
+};
 
 // For overloaded lambdas...
 template <class... Ts> struct overloaded : Ts...
