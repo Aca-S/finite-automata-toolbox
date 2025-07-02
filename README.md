@@ -9,7 +9,7 @@ Features:
 - Generate test strings and watch how they match against automata
 - Multiple automata scene support and file saving
 
-## Required for building
+## Building
 
 To build this project, you will need:
 - A C++ compiler supporting C++23
@@ -17,6 +17,14 @@ To build this project, you will need:
 - Flex
 - Bison
 - Graphviz
+
+If you are using Nix, you can run `nix develop` in the root of the repository to enter a shell with the required dependencies.
+
+```
+mkdir build && cd build
+cmake ..
+make
+```
 
 ## Notes
 
